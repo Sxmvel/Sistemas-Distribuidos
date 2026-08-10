@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "nome": "Samuel Resende",
+    "idade": 23,
+    "habilidades": ["Python", "SQL"],
+    "matriculado": true
+  },
+  {
+    "id": 2,
+    "nome": "Carlos Souza",
+    "idade": 35,
+    "habilidades": ["JavaScript", "React"],
+    "matriculado": false
+  }
+]
