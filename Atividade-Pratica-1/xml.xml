@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Alunos>
+    <Aluno>
+        <id>1</id>
+        <nome>Samuel Resende</nome>
+        <idade>23</idade>
+        <habilidades>
+            <habilidade>Python</habilidade>
+            <habilidade>SQL</habilidade>
+        </habilidades>
+        <matriculado>true</matriculado>
+    </Aluno>
+    <Aluno>
+        <id>2</id>
+        <nome>Carlos Souza</nome>
+        <idade>35</idade>
+        <habilidades>
+            <habilidade>JavaScript</habilidade>
+            <habilidade>React</habilidade>
+        </habilidades>
+        <matriculado>false</matriculado>
+    </Aluno>
+</Alunos>
