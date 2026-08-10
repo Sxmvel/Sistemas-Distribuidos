@@ -1,0 +1,3 @@
+id,nome,idade,habilidades,matriculado
+1,Samuel Resende,23,"Python, SQL",true
+2,Carlos Souza,35,"JavaScript, React",false
