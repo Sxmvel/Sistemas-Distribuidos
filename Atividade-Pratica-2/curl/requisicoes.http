@@ -1,0 +1,130 @@
+@base = http://127.0.0.1:8000
+@livro = 1
+@emprestimo = 1
+
+### Verificar disponibilidade do servico
+GET {{base}}/v1/saude
+
+### Listar livros (pagina 1, 5 por pagina)
+GET {{base}}/v1/livros?pagina=1&tamanho=5
+
+### Listar apenas livros com exemplar disponivel
+GET {{base}}/v1/livros?apenas_disponiveis=true
+
+### Filtrar por autor
+GET {{base}}/v1/livros?autor=Machado
+
+### Tamanho de pagina acima do limite -> 422
+GET {{base}}/v1/livros?tamanho=9999
+
+### Cadastrar livro -> 201 com Location e ETag
+POST {{base}}/v1/livros
+Content-Type: application/json
+
+{
+  "titulo": "O Cortico",
+  "autor": "Aluisio Azevedo",
+  "isbn": "9788572322270",
+  "ano": 1890,
+  "exemplares_total": 3
+}
+
+### Cadastrar com isbn repetido -> 409
+POST {{base}}/v1/livros
+Content-Type: application/json
+
+{
+  "titulo": "Outro titulo",
+  "autor": "Outro autor",
+  "isbn": "9788572322270",
+  "ano": 2000,
+  "exemplares_total": 1
+}
+
+### Cadastrar com ano invalido -> 422
+POST {{base}}/v1/livros
+Content-Type: application/json
+
+{
+  "titulo": "Livro invalido",
+  "autor": "Autor",
+  "isbn": "9780000000001",
+  "ano": 99,
+  "exemplares_total": 1
+}
+
+### Obter livro -> 200 com ETag
+GET {{base}}/v1/livros/{{livro}}
+
+### Obter livro inexistente -> 404
+GET {{base}}/v1/livros/999999
+
+### Validacao condicional -> 304 quando o ETag ainda vale
+GET {{base}}/v1/livros/{{livro}}
+If-None-Match: "1"
+
+### Substituir livro com controle de concorrencia -> 200 ou 412
+PUT {{base}}/v1/livros/{{livro}}
+Content-Type: application/json
+If-Match: "1"
+
+{
+  "titulo": "Dom Casmurro",
+  "autor": "Machado de Assis",
+  "isbn": "9788535910663",
+  "ano": 1899,
+  "exemplares_total": 4
+}
+
+### Atualizar parcialmente
+PATCH {{base}}/v1/livros/{{livro}}
+Content-Type: application/json
+
+{
+  "exemplares_total": 5
+}
+
+### PATCH sem nenhum campo -> 422
+PATCH {{base}}/v1/livros/{{livro}}
+Content-Type: application/json
+
+{}
+
+### Registrar emprestimo -> 201 com Location
+POST {{base}}/v1/livros/{{livro}}/emprestimos
+Content-Type: application/json
+
+{
+  "leitor": "Ana Ribeiro"
+}
+
+### Listar emprestimos do livro
+GET {{base}}/v1/livros/{{livro}}/emprestimos
+
+### Obter emprestimo
+GET {{base}}/v1/emprestimos/{{emprestimo}}
+
+### Registrar devolucao
+PATCH {{base}}/v1/emprestimos/{{emprestimo}}
+Content-Type: application/json
+
+{
+  "devolvido": true
+}
+
+### Tentar reabrir emprestimo -> 422
+PATCH {{base}}/v1/emprestimos/{{emprestimo}}
+Content-Type: application/json
+
+{
+  "devolvido": false
+}
+
+### Remover livro -> 204, ou 409 se houver emprestimo ativo
+DELETE {{base}}/v1/livros/{{livro}}
+
+### Rota lenta para experimentos de timeout
+GET {{base}}/v1/lento?segundos=2
+
+### Rota que sempre responde 503
+GET {{base}}/v1/indisponivel

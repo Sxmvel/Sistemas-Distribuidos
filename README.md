@@ -4,9 +4,11 @@ Repositório dedicado aos projetos e atividades práticas da disciplina de Siste
 
 ## 🛠️ Tecnologias Utilizadas
 * **Linguagem:** Python
-* **Comunicação:** Sockets TCP/IP
+* **Comunicação:** Sockets TCP/IP, HTTP/REST
 * **Formatos de Dados:** CSV, JSON, XML, YAML, TOML
-* **Bibliotecas Externas:** `pyyaml`, `toml`
+* **Frameworks:** FastAPI, Pydantic, pytest
+* **Persistência:** SQLite (`sqlite3`)
+* **Bibliotecas Externas:** `pyyaml`, `toml`, `requests`
 
 ---
 
@@ -32,5 +34,23 @@ O **Cliente** empacota um conjunto de dados predefinidos (Nome, CPF, Idade, Mens
   4. `YAML` (YAML Ain't Markup Language)
   5. `TOML` (Tom's Obvious, Minimal Language)
 * **Controle de Fluxo:** Implementação de uma confirmação simples de recebimento (ACK) para evitar a junção de pacotes no buffer do protocolo TCP.
+
+---
+
+### 📍 [Atividade Prática 2](Atividade-Pratica-2/README.MD)
+
+#### API REST de gerenciamento de acervo de biblioteca
+> Construção de uma API REST completa sobre HTTP, saindo do protocolo próprio da Atividade 1 para um protocolo de aplicação padronizado. O domínio escolhido é o acervo de uma biblioteca, com duas coleções relacionadas: **livros** e os **empréstimos** de cada livro.
+
+A virada conceitual em relação à Atividade 1 está em perceber que problemas resolvidos manualmente lá já tinham solução no HTTP: o prefixo `FORMATO|payload` vira o cabeçalho `Content-Type`, e o ACK que evitava a junção de pacotes no TCP vira o `Content-Length`.
+
+* **Recursos implementados:** 12 endpoints cobrindo `GET`, `POST`, `PUT`, `PATCH` e `DELETE`, com sub-recursos aninhados (`/v1/livros/{id}/emprestimos`).
+* **Semântica HTTP:** uso deliberado de `200`, `201`, `204`, `304`, `404`, `409`, `412`, `422` e `503`, com `Location` na criação e `Retry-After` na indisponibilidade.
+* **Validação:** modelos Pydantic separados para entrada e saída, com `extra="forbid"` rejeitando campos desconhecidos em vez de ignorá-los.
+* **Tratamento de erros:** envelope único em `application/problem+json`, traduzindo erros técnicos do banco em erros de domínio sem vazar detalhes internos.
+* **Concorrência:** controle otimista com `ETag`/`If-Match` (`412`) e validação condicional com `If-None-Match` (`304`), demonstrando a perda de atualização e o mecanismo que a impede.
+* **Observabilidade:** log estruturado em JSON com identificador de correlação, método, caminho, status e duração de cada requisição.
+* **Testes:** 45 testes automatizados em `pytest` e 8 cenários com cliente programático que geram a tabela de evidências automaticamente.
+* **Principais aprendizados:** distinção entre recurso e representação; idempotência como propriedade do estado final e não da resposta; e a diferença crítica entre *"o servidor respondeu erro"* e *"o cliente não obteve resposta"* — a segunda deixa o cliente sem saber se a operação chegou a ser executada.
 
 ---
