@@ -1,7 +1,7 @@
 # Evidências de teste
 
 > Documento gerado automaticamente por `cliente/executar_todos.py`.
-> Execução em 03/09/2026 17:53:31 contra `http://127.0.0.1:8000` com timeout de 3.0s no cliente.
+> Execução em 17/09/2026 00:18:57 contra `http://127.0.0.1:8000` com timeout de 3.0s no cliente.
 
 **Resultado: 44 de 44 verificações conforme o esperado.**
 

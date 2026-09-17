@@ -10,6 +10,49 @@ estruturado e testes de comportamento.
 
 ---
 
+## O problema que a atividade resolve
+
+A [AP1](../Atividade-Pratica-1/README.MD) construiu um protocolo de aplicação do zero sobre
+sockets TCP e, ao fazer isso, expôs tudo o que um protocolo precisa resolver: identificar o
+conteúdo, delimitar a mensagem, confirmar o recebimento e sinalizar erro. Cada um desses
+problemas foi resolvido lá com uma convenção improvisada — o prefixo `FORMATO|`, um `ACK` de
+dois bytes, um `print` de exceção.
+
+A AP2 troca o protocolo próprio pelo HTTP e a descoberta central é que **aqueles problemas já
+estavam resolvidos, e melhor**:
+
+| Problema | Solução improvisada na AP1 | Solução padronizada na AP2 |
+| --- | --- | --- |
+| O que são estes bytes? | prefixo `FORMATO\|` | cabeçalho `Content-Type` |
+| Onde a mensagem termina? | `ACK` do servidor a cada mensagem | `Content-Length` |
+| Deu certo? | sempre `OK`, mesmo com exceção | código de status HTTP |
+| O que exatamente falhou? | texto livre no console do servidor | corpo `application/problem+json` |
+| Como saber se mudou? | não havia como | `ETag` e requisições condicionais |
+
+Mas adotar HTTP não é só trocar de biblioteca. O protocolo traz um modelo junto — **recursos
+identificados por URL, manipulados por um conjunto fixo de métodos com semântica definida** — e
+a atividade consiste em modelar a biblioteca dentro desse modelo, respeitando o que cada método
+promete.
+
+## Conceitos estudados
+
+| Conceito | Onde aparece |
+| --- | --- |
+| Recurso contra representação | um livro tem uma URL; o JSON devolvido é uma de suas representações |
+| Interface uniforme | os mesmos cinco métodos valem para livros e empréstimos |
+| Semântica dos métodos | `PUT` substitui, `PATCH` altera em parte, `DELETE` remove |
+| Idempotência | propriedade do **estado final**, não da resposta — `DELETE` repetido devolve 404, e ainda é idempotente |
+| Sub-recurso aninhado | `/v1/livros/{id}/emprestimos` expressa a relação 1 para N na própria URL |
+| Códigos de status como contrato | 409 e 412 dizem coisas diferentes, e o cliente age diferente em cada |
+| Negociação e envelope de erro | `application/problem+json` em vez de um JSON de erro inventado |
+| Concorrência otimista | `ETag` + `If-Match` detectam escrita sobre versão antiga (412) |
+| Cache condicional | `If-None-Match` evita transferir o que o cliente já tem (304) |
+| Paginação | coleção grande não cabe em uma resposta; página, tamanho e limite máximo |
+| Observabilidade | log estruturado com identificador de correlação por requisição |
+| Erro de aplicação contra falha de transporte | `503` é resposta; `ConnectionError` é ausência de resposta |
+
+---
+
 ## Execução
 
 ### 1. Ambiente
@@ -110,7 +153,12 @@ em [`docs/04-evidencias.md`](docs/04-evidencias.md).
 | 9 | GET | `/v1/emprestimos/{id}` | 200 | 404 |
 | 10 | PATCH | `/v1/emprestimos/{id}` | 200 | 404, 409, 422 |
 | 11 | GET | `/v1/saude` | 200 | 503 |
-| 12 | GET | `/v1/lento`, `/v1/indisponivel` | 200, 503 | — |
+| 12 | GET | `/v1/lento` | 200 | — |
+| 13 | GET | `/v1/indisponivel` | — | 503 |
+
+Treze endpoints ao todo: dez de domínio (1 a 10) e três de diagnóstico (11 a 13). Os de
+diagnóstico não fazem parte do modelo da biblioteca — existem para que os cenários C07 e C08
+possam provocar timeout e indisponibilidade de forma determinística.
 
 Detalhamento de parâmetros, corpos e cabeçalhos em
 [`docs/03-contrato-da-api.md`](docs/03-contrato-da-api.md).
@@ -124,7 +172,7 @@ Detalhamento de parâmetros, corpos e cabeçalhos em
 | [00 - Índice](docs/00-indice.md) | mapa de cada conceito da apostila até o arquivo que o implementa |
 | [01 - Fundamentos REST](docs/01-fundamentos-rest.md) | estilo arquitetural, interface uniforme, métodos e status |
 | [02 - Modelagem](docs/02-modelagem-do-dominio.md) | recursos, relações e as decisões de esquema justificadas |
-| [03 - Contrato](docs/03-contrato-da-api.md) | os doze endpoints em detalhe |
+| [03 - Contrato](docs/03-contrato-da-api.md) | cada endpoint em detalhe: parâmetros, corpo, status e cabeçalhos |
 | [04 - Evidências](docs/04-evidencias.md) | tabela gerada pela execução dos cenários |
 | [05 - Análise](docs/05-questoes-de-analise.md) | as quatro questões da atividade, respondidas |
 | [06 - Glossário](docs/06-glossario.md) | termos usados no projeto |
@@ -172,7 +220,7 @@ de qualquer erro, permitindo localizar a requisição exata a partir do relato d
 | Requisito | Onde é atendido |
 | --- | --- |
 | Duas coleções relacionadas | livros e empréstimos, com relação 1 para N |
-| No mínimo seis endpoints | doze, cobrindo GET, POST, PUT, PATCH e DELETE |
+| No mínimo seis endpoints | treze, cobrindo GET, POST, PUT, PATCH e DELETE |
 | Validação de entrada | `app/esquemas.py`, com `extra="forbid"` e validadores próprios |
 | Tratamento explícito de 404 e 409 | `app/erros.py`, cenários C03 e C04 |
 | Cliente de teste com timeout | `cliente/comum.py`, `TIMEOUT = 3.0` em toda requisição |
@@ -211,3 +259,82 @@ Get-Content logs\api.jsonl -Tail 5
 3. os cenários exibem os 44 resultados e regravam a tabela de evidências
 4. o `pytest` confirma as invariantes de contrato
 5. o log mostra método, caminho, status, duração e correlação de cada requisição
+
+---
+
+## Decisões de projeto
+
+**SQLite com `sqlite3` puro, sem ORM.** Um ORM esconderia exatamente o que a atividade quer
+mostrar: a tradução entre o modelo de recursos da API e o modelo relacional do banco. Com SQL
+parametrizado à vista, fica explícito onde a restrição de unicidade do ISBN vira um `409` e
+onde a chave estrangeira vira um `404`.
+
+**Camada de repositório separada das rotas.** As rotas traduzem HTTP para domínio e vice-versa;
+os repositórios não sabem que existe HTTP. Por isso um erro de domínio como "livro sem exemplar
+disponível" é levantado sem escolher código de status — a escolha acontece em um único lugar,
+em `app/erros.py`. É a mesma separação que a AP4 repete com os interceptors.
+
+**Esquemas de entrada e saída separados, com `extra="forbid"`.** Um campo desconhecido no corpo
+é recusado com `422` em vez de ignorado em silêncio. Ignorar seria pior: o cliente acharia que
+enviou algo que o servidor nunca leu — e descobriria em produção.
+
+**`application/problem+json` em vez de um envelope próprio.** O formato é padronizado (RFC 9457)
+e evita a decisão arbitrária de como nomear os campos de erro. Todo erro carrega o mesmo
+identificador de correlação que aparece no log, então o relato de um cliente localiza a
+requisição exata.
+
+**Versão no caminho (`/v1/...`).** É a forma mais visível de versionar, e deixa explícito que o
+contrato pode mudar. A AP4 faz o mesmo no nome do pacote `.proto`, pelo mesmo motivo.
+
+**Rotas de diagnóstico separadas do domínio.** `/v1/lento` e `/v1/indisponivel` existem porque
+demonstrar timeout e indisponibilidade **de propósito** é mais confiável do que esperar uma
+falha acontecer. É a mesma ideia dos controles de laboratório do servidor da AP4.
+
+---
+
+## Aprendizados
+
+**Idempotência é propriedade do estado final, não da resposta.** Foi o ponto que mais mudou de
+forma ao ser testado. `DELETE` de um livro devolve `204` na primeira chamada e `404` na segunda
+— respostas diferentes, e ainda assim a operação é idempotente, porque o estado do servidor é o
+mesmo nos dois casos. Confundir "mesma resposta" com "mesmo efeito" leva a clientes que tratam
+o segundo `404` como erro quando ele é, na verdade, confirmação.
+
+**Nem todo conflito é o mesmo conflito.** `409` e `412` parecem intercambiáveis até você
+precisar de cada um. O `409` diz que o pedido contradiz o estado atual (emprestar um livro sem
+exemplar livre). O `412` diz que o pedido foi feito sobre uma versão que não é mais a atual
+(alterar um livro com um `ETag` velho). O primeiro é sobre o **quê**, o segundo é sobre
+**quando** — e o cliente reage diferente: no primeiro corrige o pedido, no segundo relê o
+recurso e tenta de novo.
+
+**A perda de atualização é invisível sem versionamento.** No cenário C06, dois clientes leem o
+mesmo livro, os dois editam, e sem `If-Match` o segundo `PUT` sobrescreve o primeiro sem que
+ninguém perceba. Com `ETag`, o segundo recebe `412` e fica sabendo. O mecanismo custa um
+cabeçalho e evita uma classe inteira de bug silencioso.
+
+**"O servidor respondeu erro" e "não obtive resposta" são coisas diferentes.** É a distinção do
+cenário C08, e é a mais importante da atividade. Um `503` é uma resposta: o servidor recebeu,
+decidiu e respondeu — a operação certamente não aconteceu. Um `ConnectionError` não é resposta
+nenhuma: o cliente não sabe se o pedido chegou, se foi executado, ou se só a resposta se
+perdeu. Essa dúvida reaparece medida na [AP4](../Atividade-Pratica-4/README.MD), onde um
+cliente registrou `DEADLINE_EXCEEDED` para uma chamada que o servidor concluiu com sucesso.
+
+**HTTP tem mais vocabulário do que normalmente se usa.** A maior parte das APIs vive com `200`,
+`404` e `500`. Modelar de propósito o `304`, o `412` e o `Retry-After` mostra que boa parte do
+que se costuma implementar na mão — cache, controle de concorrência, sinalização de retry — já
+está especificada e só precisa ser usada.
+
+---
+
+## Ponte para as atividades seguintes
+
+A AP2 resolve o que a AP1 deixou em aberto, e deixa as suas próprias perguntas:
+
+| Limite da AP2 | Consequência | Explorado em |
+| --- | --- | --- |
+| O cliente precisa saber quem chamar | acoplamento à URL do servidor | [AP3](../Atividade-Pratica-3/README.MD) — o broker desacopla quem publica de quem consome |
+| Um pedido, um destinatário | notificar três serviços exige três chamadas | AP3 — um `publish`, N assinantes |
+| O cliente espera a resposta | acoplamento temporal: os dois precisam estar no ar | AP3 — entrega assíncrona com QoS |
+| O contrato é documentação | quebrar o formato só aparece em execução | [AP4](../Atividade-Pratica-4/README.MD) — `.proto` compilado nas duas pontas |
+| JSON é verboso e sem tipo garantido | validação em tempo de execução, a cada requisição | AP4 — Protocol Buffers, tipos verificados na geração |
+

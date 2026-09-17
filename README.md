@@ -80,7 +80,7 @@ execução no seu README ou em `docs/`.
 
 ## 🚀 Atividades Realizadas
 
-### 📍 [Atividade Prática 1](Atividade-Pratica-1/)
+### 📍 [Atividade Prática 1](Atividade-Pratica-1/README.MD)
 
 #### 1.1 — Formatos de serialização baseados em texto
 
@@ -159,7 +159,7 @@ que evitava a junção de pacotes no TCP vira o `Content-Length`.
 
 ---
 
-### 📍 [Atividade Prática 3](Atividade-Pratica-3/)
+### 📍 [Atividade Prática 3](Atividade-Pratica-3/README.MD)
 
 #### Publish/subscribe com MQTT e broker Mosquitto
 

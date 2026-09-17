@@ -9,7 +9,7 @@ partida para revisar a matéria a partir do código que roda.
 | --- | --- |
 | [01 - Fundamentos REST](01-fundamentos-rest.md) | REST como estilo arquitetural, interface uniforme, métodos e status |
 | [02 - Modelagem do domínio](02-modelagem-do-dominio.md) | Recursos, relações e as decisões de esquema com suas justificativas |
-| [03 - Contrato da API](03-contrato-da-api.md) | Os doze endpoints, com códigos de status e cabeçalhos de cada um |
+| [03 - Contrato da API](03-contrato-da-api.md) | Cada endpoint em detalhe, com códigos de status e cabeçalhos |
 | [04 - Evidências](04-evidencias.md) | Tabela de testes gerada pela execução dos cenários |
 | [05 - Questões de análise](05-questoes-de-analise.md) | As quatro questões da atividade, respondidas |
 | [06 - Glossário](06-glossario.md) | Termos usados no projeto |
