@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package biblioteca.emprestimos.v1;
+
+enum Situacao {
+  SITUACAO_NAO_INFORMADA = 0;
+  SITUACAO_ATIVO = 1;
+  SITUACAO_DEVOLVIDO = 2;
+}
+
+message Emprestimo {
+  string codigo = 1;
+  string isbn = 2;
+  string titulo = 3;
+  string unidade = 4;
+  string emprestado_em = 5;
+  string previsto_para = 6;
+  string devolvido_em = 7;
+  Situacao situacao = 8;
+}
+
+message RegistrarEmprestimoRequest {
+  string isbn = 1;
+  string leitor = 2;
+  string dias = 3;
+  string chave_idempotencia = 4;
+  string unidade = 5;
+}
