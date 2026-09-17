@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+package biblioteca.emprestimos.v1;
+
+service Emprestimos {
+  rpc RegistrarEmprestimo (RegistrarEmprestimoRequest) returns (RegistrarEmprestimoResponse);
+  rpc ConsultarEmprestimo (ConsultarEmprestimoRequest) returns (ConsultarEmprestimoResponse);
+  rpc RegistrarDevolucao (RegistrarDevolucaoRequest) returns (RegistrarDevolucaoResponse);
+  rpc CalcularMultas (CalcularMultasRequest) returns (CalcularMultasResponse);
+  rpc ListarEmprestimos (ListarEmprestimosRequest) returns (stream Emprestimo);
+}
+
+enum Situacao {
+  SITUACAO_NAO_INFORMADA = 0;
+  SITUACAO_ATIVO = 1;
+  SITUACAO_DEVOLVIDO = 2;
+}
+
+message Emprestimo {
+  string codigo = 1;
+  string isbn = 2;
+  string titulo = 3;
+  string leitor = 4;
+  string emprestado_em = 5;
+  string previsto_para = 6;
+  string devolvido_em = 7;
+  Situacao situacao = 8;
+}
+
+message RegistrarEmprestimoRequest {
+  string isbn = 1;
+  string leitor = 2;
+  int32 dias = 3;
+  string chave_idempotencia = 4;
+}
+
+message RegistrarEmprestimoResponse {
+  Emprestimo emprestimo = 1;
+  bool reaproveitado = 2;
+}
+
+message ConsultarEmprestimoRequest {
+  string codigo = 1;
+}
+
+message ConsultarEmprestimoResponse {
+  Emprestimo emprestimo = 1;
+}
+
+message RegistrarDevolucaoRequest {
+  string codigo = 1;
+  string devolvido_em = 2;
+}
+
+message RegistrarDevolucaoResponse {
+  Emprestimo emprestimo = 1;
+  int32 dias_de_atraso = 2;
+  double multa = 3;
+}
+
+message CalcularMultasRequest {
+  repeated string codigos = 1;
+  string referencia = 2;
+}
+
+message MultaDoEmprestimo {
+  string codigo = 1;
+  int32 dias_de_atraso = 2;
+  double multa = 3;
+}
+
+message CalcularMultasResponse {
+  repeated MultaDoEmprestimo itens = 1;
+  double total = 2;
+  int32 quantidade = 3;
+}
+
+message ListarEmprestimosRequest {
+  string leitor = 1;
+  Situacao situacao = 2;
+  int32 limite = 3;
+}
