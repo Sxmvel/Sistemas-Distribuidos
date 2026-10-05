@@ -1,8 +1,9 @@
 import sqlite3
 from contextlib import contextmanager
-from pathlib import Path
 
-CAMINHO_BANCO = Path(__file__).resolve().parent.parent / "biblioteca.db"
+from app import config
+
+CAMINHO_BANCO = config.caminho_do_banco
 
 ESQUEMA = """
 CREATE TABLE IF NOT EXISTS livros (

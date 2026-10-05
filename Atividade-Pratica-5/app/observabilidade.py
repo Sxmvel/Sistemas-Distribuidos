@@ -3,13 +3,15 @@ import logging
 import time
 import uuid
 from datetime import datetime, timezone
-from pathlib import Path
 
 from starlette.middleware.base import BaseHTTPMiddleware
 
+from app import config
+
 CABECALHO_CORRELACAO = "X-Request-ID"
 CABECALHO_DURACAO = "X-Duracao-Ms"
-CAMINHO_DO_LOG = Path(__file__).resolve().parent.parent / "logs" / "api.jsonl"
+cabecalho_tentativa = "X-Tentativa"
+CAMINHO_DO_LOG = config.caminho_do_log
 
 
 def configurar_registrador() -> logging.Logger:
@@ -37,7 +39,9 @@ class RegistroDeRequisicoes(BaseHTTPMiddleware):
     def escrever(self, correlacao, requisicao, status_http, duracao_ms, falha=None):
         evento = {
             "instante": datetime.now(timezone.utc).isoformat(timespec="milliseconds"),
+            "processo": config.identificador_do_processo,
             "correlacao": correlacao,
+            "tentativa": requisicao.headers.get(cabecalho_tentativa),
             "metodo": requisicao.method,
             "caminho": requisicao.url.path,
             "consulta": requisicao.url.query or None,

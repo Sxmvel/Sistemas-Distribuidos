@@ -3,17 +3,36 @@ import itertools
 import pytest
 from fastapi.testclient import TestClient
 
-from app import db
+from app import config, db
 from app.main import app
 
 contador = itertools.count(1)
 
 
+def cabecalho_de(papel):
+    return {"Authorization": f"Bearer {config.tokens[papel]}"}
+
+
 @pytest.fixture
-def cliente(tmp_path, monkeypatch):
+def banco_temporario(tmp_path, monkeypatch):
     monkeypatch.setattr(db, "CAMINHO_BANCO", tmp_path / "teste.db")
+
+
+@pytest.fixture
+def cliente(banco_temporario):
+    with TestClient(app, headers=cabecalho_de("bibliotecario")) as testador:
+        yield testador
+
+
+@pytest.fixture
+def anonimo(banco_temporario):
     with TestClient(app) as testador:
         yield testador
+
+
+@pytest.fixture
+def laboratorio(monkeypatch):
+    monkeypatch.setattr(config, "laboratorio_ativo", True)
 
 
 @pytest.fixture
