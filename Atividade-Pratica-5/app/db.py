@@ -25,6 +25,13 @@ CREATE TABLE IF NOT EXISTS emprestimos (
 );
 
 CREATE INDEX IF NOT EXISTS idx_emprestimos_livro ON emprestimos (livro_id);
+
+CREATE TABLE IF NOT EXISTS chaves_de_idempotencia (
+    chave         TEXT    PRIMARY KEY,
+    impressao     TEXT    NOT NULL,
+    emprestimo_id INTEGER NOT NULL REFERENCES emprestimos(id) ON DELETE CASCADE,
+    criada_em     TEXT    NOT NULL
+);
 """
 
 
@@ -50,6 +57,7 @@ def inicializar():
 
 def limpar():
     with conexao() as conn:
+        conn.execute("DELETE FROM chaves_de_idempotencia")
         conn.execute("DELETE FROM emprestimos")
         conn.execute("DELETE FROM livros")
         conn.execute("DELETE FROM sqlite_sequence WHERE name IN ('livros', 'emprestimos')")

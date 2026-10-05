@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Header, Query, Response, status
 
-from app import concorrencia
+from app import concorrencia, seguranca
 from app.esquemas import Livro, LivroEntrada, LivroParcial, PaginaDeLivros
 from app.paginacao import DependenciaDePaginacao, contar_paginas
 from app.repositorios import livros as repositorio
@@ -35,7 +35,13 @@ def listar_livros(
     )
 
 
-@roteador.post("", response_model=Livro, status_code=status.HTTP_201_CREATED, summary="Cadastrar livro")
+@roteador.post(
+    "",
+    response_model=Livro,
+    status_code=status.HTTP_201_CREATED,
+    summary="Cadastrar livro",
+    dependencies=[seguranca.somente_bibliotecario],
+)
 def criar_livro(entrada: LivroEntrada, resposta: Response):
     livro = repositorio.criar(entrada.model_dump())
     resposta.headers["Location"] = f"/v1/livros/{livro['id']}"
@@ -58,7 +64,12 @@ def obter_livro(livro_id: int, resposta: Response, if_none_match: CabecalhoIfNon
     return livro
 
 
-@roteador.put("/{livro_id}", response_model=Livro, summary="Substituir livro")
+@roteador.put(
+    "/{livro_id}",
+    response_model=Livro,
+    summary="Substituir livro",
+    dependencies=[seguranca.somente_bibliotecario],
+)
 def substituir_livro(
     livro_id: int,
     entrada: LivroEntrada,
@@ -72,7 +83,12 @@ def substituir_livro(
     return livro
 
 
-@roteador.patch("/{livro_id}", response_model=Livro, summary="Atualizar livro parcialmente")
+@roteador.patch(
+    "/{livro_id}",
+    response_model=Livro,
+    summary="Atualizar livro parcialmente",
+    dependencies=[seguranca.somente_bibliotecario],
+)
 def atualizar_livro(
     livro_id: int,
     entrada: LivroParcial,
@@ -86,7 +102,12 @@ def atualizar_livro(
     return livro
 
 
-@roteador.delete("/{livro_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Remover livro")
+@roteador.delete(
+    "/{livro_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Remover livro",
+    dependencies=[seguranca.somente_bibliotecario],
+)
 def remover_livro(livro_id: int, if_match: CabecalhoIfMatch = None):
     atual = repositorio.obter_ou_falhar(livro_id)
     concorrencia.conferir_if_match(if_match, atual["versao"])

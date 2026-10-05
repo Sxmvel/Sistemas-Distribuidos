@@ -7,12 +7,15 @@ TIPO_DE_MIDIA = "application/problem+json"
 
 TITULOS_PADRAO = {
     status.HTTP_400_BAD_REQUEST: "Requisição inválida",
+    status.HTTP_401_UNAUTHORIZED: "Autenticação necessária",
+    status.HTTP_403_FORBIDDEN: "Operação não permitida",
     status.HTTP_404_NOT_FOUND: "Recurso não encontrado",
     status.HTTP_405_METHOD_NOT_ALLOWED: "Método não permitido",
     status.HTTP_409_CONFLICT: "Conflito com o estado atual",
     status.HTTP_412_PRECONDITION_FAILED: "Precondição falhou",
     status.HTTP_422_UNPROCESSABLE_CONTENT: "Entrada inválida",
     status.HTTP_500_INTERNAL_SERVER_ERROR: "Falha interna",
+    status.HTTP_503_SERVICE_UNAVAILABLE: "Serviço indisponível",
 }
 
 
@@ -20,6 +23,7 @@ class ErroDeDominio(Exception):
     status_http = status.HTTP_400_BAD_REQUEST
     tipo = "erro-de-dominio"
     titulo = "Erro de domínio"
+    cabecalhos: dict = {}
 
     def __init__(self, detalhe: str):
         super().__init__(detalhe)
@@ -44,6 +48,25 @@ class PrecondicaoFalhou(ErroDeDominio):
     titulo = "Precondição falhou"
 
 
+class NaoAutenticado(ErroDeDominio):
+    status_http = status.HTTP_401_UNAUTHORIZED
+    tipo = "nao-autenticado"
+    titulo = "Autenticação necessária"
+    cabecalhos = {"WWW-Authenticate": 'Bearer realm="biblioteca"'}
+
+
+class SemPermissao(ErroDeDominio):
+    status_http = status.HTTP_403_FORBIDDEN
+    tipo = "sem-permissao"
+    titulo = "Operação não permitida"
+
+
+class ChaveDeIdempotenciaReutilizada(ErroDeDominio):
+    status_http = status.HTTP_422_UNPROCESSABLE_CONTENT
+    tipo = "chave-de-idempotencia-reutilizada"
+    titulo = "Chave de idempotência reutilizada"
+
+
 def montar_problema(requisicao: Request, status_http: int, tipo: str, titulo: str, detalhe: str, extras=None):
     problema = {
         "tipo": tipo,
@@ -58,18 +81,23 @@ def montar_problema(requisicao: Request, status_http: int, tipo: str, titulo: st
     return problema
 
 
-def responder_problema(requisicao: Request, status_http: int, tipo: str, titulo: str, detalhe: str, extras=None):
+def responder_problema(
+    requisicao: Request, status_http: int, tipo: str, titulo: str, detalhe: str, extras=None, cabecalhos=None
+):
     return JSONResponse(
         status_code=status_http,
         content=montar_problema(requisicao, status_http, tipo, titulo, detalhe, extras),
         media_type=TIPO_DE_MIDIA,
+        headers=cabecalhos,
     )
 
 
 def registrar_tratadores(app: FastAPI) -> None:
     @app.exception_handler(ErroDeDominio)
     async def tratar_erro_de_dominio(requisicao: Request, erro: ErroDeDominio):
-        return responder_problema(requisicao, erro.status_http, erro.tipo, erro.titulo, erro.detalhe)
+        return responder_problema(
+            requisicao, erro.status_http, erro.tipo, erro.titulo, erro.detalhe, cabecalhos=erro.cabecalhos or None
+        )
 
     @app.exception_handler(RequestValidationError)
     async def tratar_entrada_invalida(requisicao: Request, erro: RequestValidationError):
@@ -97,6 +125,7 @@ def registrar_tratadores(app: FastAPI) -> None:
             "erro-http",
             TITULOS_PADRAO.get(erro.status_code, "Erro"),
             str(erro.detail),
+            cabecalhos=getattr(erro, "headers", None),
         )
 
     @app.exception_handler(Exception)

@@ -1,5 +1,8 @@
-from fastapi import APIRouter, Response, status
+from typing import Annotated
 
+from fastapi import APIRouter, Header, Response, status
+
+from app import falhas, seguranca
 from app.esquemas import Emprestimo, EmprestimoEntrada, EmprestimoParcial
 from app.repositorios import emprestimos as repositorio
 
@@ -21,10 +24,19 @@ def listar_emprestimos_do_livro(livro_id: int):
     response_model=Emprestimo,
     status_code=status.HTTP_201_CREATED,
     summary="Registrar empréstimo de um livro",
+    dependencies=[seguranca.atendimento],
 )
-def registrar_emprestimo(livro_id: int, entrada: EmprestimoEntrada, resposta: Response):
-    emprestimo = repositorio.criar(livro_id, entrada.leitor)
+def registrar_emprestimo(
+    livro_id: int,
+    entrada: EmprestimoEntrada,
+    resposta: Response,
+    chave: Annotated[str | None, Header(alias="Idempotency-Key", min_length=8, max_length=80)] = None,
+):
+    emprestimo, reaproveitado = repositorio.registrar(livro_id, entrada.leitor, chave)
+    falhas.atrasar_escrita()
     resposta.headers["Location"] = f"/v1/emprestimos/{emprestimo['id']}"
+    if reaproveitado:
+        resposta.headers["Idempotent-Replayed"] = "true"
     return emprestimo
 
 
@@ -33,6 +45,11 @@ def obter_emprestimo(emprestimo_id: int):
     return repositorio.obter_ou_falhar(emprestimo_id)
 
 
-@roteador.patch("/{emprestimo_id}", response_model=Emprestimo, summary="Registrar devolução")
+@roteador.patch(
+    "/{emprestimo_id}",
+    response_model=Emprestimo,
+    summary="Registrar devolução",
+    dependencies=[seguranca.atendimento],
+)
 def atualizar_emprestimo(emprestimo_id: int, entrada: EmprestimoParcial):
     return repositorio.registrar_devolucao(emprestimo_id)
