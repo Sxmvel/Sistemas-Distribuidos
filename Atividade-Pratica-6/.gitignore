@@ -1,0 +1,4 @@
+target/
+*.class
+__pycache__/
+~$*.docx
