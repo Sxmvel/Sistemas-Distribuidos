@@ -5,8 +5,8 @@ com Maven. Parte do código `explorar_cadeia.py` do enunciado e mostra, com expe
 reproduzíveis, o que o hash resolve (detectar adulteração) e o que ele não resolve (escolher
 entre duas cópias válidas que divergem). Essa escolha depende de um protocolo distribuído.
 
-As respostas às questões de análise, o texto "hash não é consenso" e o diagrama estão em
-[`Questoes-de-Analise-AP6.docx`](Questoes-de-Analise-AP6.docx).
+A tabela de experimentos, os logs dos hashes e o diagrama das réplicas divergentes ficam em
+[`evidencias/`](evidencias/). Todos são gerados pela execução descrita abaixo.
 
 ---
 

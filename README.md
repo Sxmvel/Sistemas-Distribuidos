@@ -3,11 +3,16 @@
 Repositório das atividades práticas da disciplina de **Sistemas Distribuídos**, 6º período do
 curso de Sistemas de Informação.
 
-As quatro atividades não são exercícios isolados: elas percorrem, em ordem, os estilos de
-comunicação que um sistema distribuído pode adotar — de um protocolo próprio sobre sockets até
-chamadas remotas com contrato forte. A partir da Atividade 2, todas modelam **o mesmo domínio**
-(o acervo e os empréstimos de uma biblioteca), de propósito: com o problema fixo, o que a
-comparação revela é o estilo de comunicação, e não a diferença entre os domínios.
+As atividades não são exercícios isolados. As quatro primeiras percorrem, em ordem, os estilos
+de comunicação que um sistema distribuído pode adotar — de um protocolo próprio sobre sockets
+até chamadas remotas com contrato forte. A partir da Atividade 2, elas modelam **o mesmo
+domínio** (o acervo e os empréstimos de uma biblioteca), de propósito: com o problema fixo, o
+que a comparação revela é o estilo de comunicação, e não a diferença entre os domínios.
+
+As duas seguintes mudam a pergunta. A **Atividade 5** submete a API da biblioteca a falhas
+controladas para medir o que acontece quando a comunicação dá errado, e a **Atividade 6** sai
+da biblioteca para uma blockchain didática: com várias cópias do mesmo estado, como saber qual
+é a certa?
 
 ---
 
@@ -34,6 +39,17 @@ garantias como "pelo menos uma vez" trazem duplicação junto.
 código dos dois lados, o deadline viaja no protocolo e o status de erro é padronizado. O preço
 agora é acoplamento de esquema — cliente e servidor compartilham um artefato gerado.
 
+**A Atividade 5** leva a sério o terceiro resultado que a AP4 mediu ("não se sabe"). A API REST
+da AP2 é submetida a atraso, erro, queda do servidor, perda de mensagem no canal e falhas
+simultâneas, e o cliente ganha retry com backoff, failover e circuit breaker. A atividade mede
+quando cada mecanismo ajuda e quando atrapalha: sem chave de idempotência, o retry transformou
+uma intenção em três empréstimos.
+
+**A Atividade 6** passa de uma cópia do estado para várias. Numa blockchain didática, o hash
+encadeado detecta qualquer adulteração. Mesmo assim, um atacante que reescreve a própria cópia
+a torna válida de novo, e duas réplicas separadas por uma partição podem ser válidas e discordar.
+Integridade não é consenso.
+
 | | AP1 | AP2 | AP3 | AP4 |
 | --- | --- | --- | --- | --- |
 | **Estilo** | protocolo próprio | requisição/resposta | publish/subscribe | chamada de procedimento |
@@ -45,36 +61,44 @@ agora é acoplamento de esquema — cliente e servidor compartilham um artefato 
 | **Quem conhece quem** | endereço fixo | cliente conhece a URL | ninguém conhece ninguém | cliente conhece método e endereço |
 | **Canal de erro** | nenhum | status HTTP | não existe | status gRPC |
 
+A tabela compara os estilos de comunicação das quatro primeiras atividades. As atividades 5 e 6
+não introduzem um estilo novo. Usam o que veio antes para estudar falhas e acordo entre cópias.
+
 ---
 
 ## 🛠️ Tecnologias utilizadas
 
-| Camada | AP1 | AP2 | AP3 | AP4 |
-| --- | --- | --- | --- | --- |
-| Comunicação | `socket` (TCP/IP) | FastAPI / HTTP | `paho-mqtt` (MQTT 5) | `grpcio` / HTTP/2 |
-| Serialização | CSV, JSON, XML, YAML, TOML | JSON + Pydantic | JSON (envelope próprio) | Protocol Buffers |
-| Persistência | — | SQLite (`sqlite3` puro) | SQLite (deduplicação) | memória com trava |
-| Infraestrutura | — | — | Mosquitto 2 em Docker | — |
-| Testes | manual | `pytest` (45) | `pytest` (61) | `pytest` (58) |
+| Camada | AP1 | AP2 | AP3 | AP4 | AP5 | AP6 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Comunicação | `socket` (TCP/IP) | FastAPI / HTTP | `paho-mqtt` (MQTT 5) | `grpcio` / HTTP/2 | FastAPI + `requests` e proxy TCP de falhas | réplicas em memória, sem rede |
+| Serialização | CSV, JSON, XML, YAML, TOML | JSON + Pydantic | JSON (envelope próprio) | Protocol Buffers | JSON + Pydantic | JSON canônico + SHA-256 |
+| Persistência | — | SQLite (`sqlite3` puro) | SQLite (deduplicação) | memória com trava | SQLite (`sqlite3` puro) | memória (cadeias imutáveis) |
+| Infraestrutura | — | — | Mosquitto 2 em Docker | — | servidores em subprocesso | Maven multimódulo |
+| Testes | manual | `pytest` (45) | `pytest` (61) | `pytest` (58) | `pytest` (81) | 54 verificações nos experimentos |
 
-**Linguagem:** Python em todas as atividades.
+**Linguagem:** Python nas atividades 1 a 5 e Java 21 na Atividade 6.
 
 ---
 
 ## 🗂️ Organização do repositório
 
-Cada atividade tem a sua própria pasta e o seu próprio branch, com ambiente virtual e
-dependências independentes. Não há nada compartilhado entre elas além do domínio modelado.
+Cada atividade tem a sua própria pasta e o seu próprio branch, com dependências independentes:
+ambiente virtual Python nas atividades 1 a 5 e projeto Maven na 6. Nada é compartilhado entre
+elas além do domínio modelado. A AP5 parte de uma cópia da API da AP2, e a AP2 original não é
+alterada.
 
 ```text
 Atividade-Pratica-1/   serialização em texto e cliente-servidor com sockets
 Atividade-Pratica-2/   API REST com FastAPI e SQLite
 Atividade-Pratica-3/   publish/subscribe com MQTT e Mosquitto
 Atividade-Pratica-4/   serviço remoto com gRPC e Protocol Buffers
+Atividade-Pratica-5/   falhas controladas, retry, circuit breaker e segurança sobre a API da AP2
+Atividade-Pratica-6/   blockchain didática em Java: integridade, réplicas e consenso
 ```
 
-As atividades 2, 3 e 4 têm documentação própria e suítes de teste; cada pasta traz o roteiro de
-execução no seu README ou em `docs/`.
+Cada pasta traz o roteiro de execução no seu README e, quando existe, em `docs/`. As atividades
+2 a 5 têm suítes de teste com `pytest`. A 6 se verifica pelos próprios experimentos, que geram
+evidências reproduzíveis em `evidencias/`.
 
 ---
 
@@ -253,6 +277,95 @@ garantia de entrega que ele oferece.
 
 ---
 
+### 📍 [Atividade Prática 5](Atividade-Pratica-5/README.MD)
+
+#### Experimentos com interação, falhas e segurança
+
+> A API REST da AP2, copiada e estendida, vira o sistema sob teste. As falhas são injetadas em
+> três lugares: no servidor (rota instável e atraso depois da escrita), no canal (um proxy TCP
+> que perde a requisição, perde a resposta ou atrasa) e no processo (encerrar, religar e matar
+> o servidor). Cada lugar produz uma classe diferente do modelo de falhas.
+
+* **Conceitos estudados:** modelos de interação e de falhas; timeout; retry; backoff com
+  *jitter*; *failover*; *circuit breaker*; idempotência; a diferença entre observar e inferir;
+  controle de acesso.
+* **Resiliência do cliente:** cada tentativa é medida e classificada (duração, status e tipo de
+  erro). Só falhas transitórias são repetidas, com backoff exponencial e jitter. Há alternância
+  entre réplicas e um disjuntor simples.
+* **Idempotência:** o registro de empréstimo aceita `Idempotency-Key`, gravada na mesma
+  transação do efeito.
+* **Correlação:** o cliente envia o mesmo `X-Request-ID` em todas as tentativas de uma chamada.
+  É isso que permite comparar o que o cliente viu com o que o servidor fez.
+* **Segurança:** token Bearer com autorização por papel (`401` e `403`), validação robusta
+  (`422`) e rota de laboratório desligada por padrão, para a ferramenta de teste não virar
+  vetor de negação de serviço.
+* **Dez cenários automatizados**, com 69 verificações e 261 tentativas medidas por execução:
+
+  | | Cenário | Resultado principal |
+  | --- | --- | --- |
+  | E01 | referência, sem falha | 40/40 com `200`; p95 ≈ 30 ms |
+  | E02 | atraso de 800 ms no servidor | cliente vê timeout, servidor registra `200` |
+  | E03 | `503` com probabilidade 0,5 | retry com backoff sobe o sucesso de 45% para 95% |
+  | E04 | servidor fora, religado, morto no meio | retry recupera depois de 2 ou 3 tentativas |
+  | E05 | proxy perde requisição, perde resposta, atrasa | quatro causas, a mesma observação |
+  | E06 | escrita lenta + retry | sem chave, 3 empréstimos para 1 intenção; com chave, 1 |
+  | E07 | 20 clientes, 60% de falha | retry imediato concentra tudo; jitter espalha |
+  | E08 | dependência fora do ar | circuit breaker corta de 12 para 3 tentativas |
+  | E09 | duas réplicas falhando juntas | failover mascara uma falha, não duas |
+  | E10 | ataques ao controle de acesso | `401`, `403` e `422` corretos; token visível sem TLS |
+
+* **Testes:** 81 testes de `pytest`, os 45 herdados da AP2 e 36 novos.
+* **Principais aprendizados:**
+  * **Timeout não diz o que aconteceu.** No E05, perder a requisição, perder a resposta e
+    atrasar a resposta produzem a mesma observação: timeout de leitura aos ~520 ms.
+  * **Retry multiplica o efeito.** Numa operação não idempotente, o retry criou três empréstimos
+    para uma única intenção.
+  * **Os mecanismos de resiliência também falham.** Sem jitter, o retry sincroniza os clientes
+    numa tempestade de tráfego, e o failover só cobre a falha que ele previu.
+
+---
+
+### 📍 [Atividade Prática 6](Atividade-Pratica-6/README.md)
+
+#### Blockchain didática: integridade, replicação e consenso
+
+> Partindo do `explorar_cadeia.py` do material, a cadeia de blocos foi reimplementada em
+> **Java 21**, com hashes idênticos aos do Python, e submetida a adulteração, reescrita e
+> réplicas divergentes. O objetivo é separar o que a criptografia resolve do que ainda depende
+> de um protocolo distribuído.
+
+* **Conceitos estudados:** hash criptográfico e efeito avalanche; encadeamento; integridade
+  contra consenso; forks como eventos concorrentes; regra de reconciliação; omissão, partição e
+  falha bizantina.
+* **Arquitetura em módulos e camadas:** quatro módulos Maven, `nucleo` → `integridade` →
+  `replicacao` → `laboratorio`, cada um com `module-info.java`. O compilador impede que uma
+  camada de baixo importe uma de cima.
+* **Port fiel ao original:** um serializador canônico reproduz o `json.dumps(sort_keys=True)`
+  do Python. Os 4 hashes da cadeia do PDF e os 25 da cadeia de referência foram conferidos no
+  código original.
+* **Reprodutibilidade:** com semente fixa, duas execuções geram as evidências idênticas byte a
+  byte, inclusive o diagrama em PNG.
+* **Cinco experimentos automatizados**, com 54 verificações:
+
+  | | Experimento | Resultado principal |
+  | --- | --- | --- |
+  | E01 | cadeia didática e referência | hashes idênticos aos do Python; 25 blocos válidos |
+  | E02 | avalanche | 1 caractere muda em média 50,4% dos 256 bits |
+  | E03 | adulteração de bloco antigo | detectada exatamente no bloco alterado, nas 4 posições |
+  | E04 | reescrita da cadeia | com 20 hashes recalculados, a fraude volta a ser "cadeia válida" |
+  | E05 | réplicas divergentes | na partição, 4 transações voltam à fila; a fraude reescrita e mais longa vence |
+
+* **Principais aprendizados:**
+  * **O hash detecta, mas não impede.** A validação local apontou toda adulteração. Mesmo
+    assim, recalcular os hashes seguintes "conserta" a cópia, porque o hash garante coerência
+    interna, não a história verdadeira.
+  * **A fraude tem a forma de um fork.** Para quem compara, a cadeia reescrita tem um ancestral
+    comum e dois ramos válidos, como um fork legítimo. Escolher entre eles é tarefa do consenso.
+  * **Uma regra sem custo é fraudável.** "A mais longa vence" aceitou a fraude com um único
+    bloco extra. Protocolos reais exigem trabalho ou stake, assinaturas e maioria honesta.
+
+---
+
 ## 🔍 Síntese comparativa
 
 O mesmo problema, resolvido em três estilos, deixa as diferenças em evidência.
@@ -288,6 +401,19 @@ ao menos oferece verbos com semântica combinada.
 * **gRPC** dá contrato executável, deadline no protocolo e status padronizado; em troca, exige
   gerar stubs, não é legível em log, e tem armadilhas de evolução que formato de texto não tem.
 
-A conclusão das quatro atividades é que eles não competem. Um sistema real de biblioteca usaria
-os três ao mesmo tempo: **REST na borda** para o catálogo público, **gRPC entre serviços**
-internos, e **MQTT para propagar** o que aconteceu.
+A conclusão das quatro primeiras atividades é que eles não competem. Um sistema real de
+biblioteca usaria os três ao mesmo tempo: **REST na borda** para o catálogo público, **gRPC
+entre serviços** internos, e **MQTT para propagar** o que aconteceu.
+
+### Da chamada que falha ao acordo entre cópias
+
+As três últimas atividades seguem a mesma incerteza em escalas crescentes:
+
+| Atividade | Escala | A incerteza | O que a atividade mostrou |
+| --- | --- | --- | --- |
+| AP4 | uma chamada | o cliente recebe `DEADLINE_EXCEEDED` e o servidor concluiu com `OK` | com chave de idempotência, repetir a chamada não duplica |
+| AP5 | várias tentativas e clientes | quatro causas diferentes produzem o mesmo timeout | o retry só ajuda com backoff, jitter e idempotência; sem eles, multiplica efeito e carga |
+| AP6 | várias cópias | duas cópias válidas discordam | nenhuma verificação local decide; é preciso consenso entre os nós |
+
+Cada passo mostra que a ferramenta local (o status, o retry, o hash) não basta, e que a
+garantia precisa ser construída no protocolo entre as partes.
