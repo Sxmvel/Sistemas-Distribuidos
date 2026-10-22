@@ -1,0 +1,67 @@
+cenário A — omissão: norte produz 3 blocos e a mensagem do bloco 16 se perde
+  bloco 15: aceito
+  bloco 16: mensagem perdida
+  bloco 17: recusado — bloco 17 fora de ordem (esperado 16)
+  A: uma cópia é prefixo da outra (atraso), ancestral comum=15 -> vence norte: mais longa (18 contra 16 blocos)
+    ponta final das duas réplicas = bc8acd5711184808413c89a11afa5ee3fe88b945175787f31adf1e7342d44ec2
+
+cenário B — partição: norte produz 6 blocos e sul produz 4, sem comunicação
+  norte: 21 blocos, cadeia válida, ponta=2dd80fa73c4004390988007c509195d037c9387b02b344b47f1756ad33983eee
+  sul:   19 blocos, cadeia válida, ponta=991e48f845763c8fbc62ce95d9c7fc80a945e6393db882c17c958887542d52c2
+  rede volta: sul recebe o bloco 15 de norte -> recusado — bloco 15 fora de ordem (esperado 19)
+  norte bloco 15 | E->C:40   | anterior=a8fb30bdd0f67eec52a1adad1cc829094765bf1d137bed381d935cb381b83115 | hash=c45924d4b6253e5bd299f0262f1218504bc7a9f3b4fd98c609ecde4385488eec
+  norte bloco 16 | H->E:16   | anterior=c45924d4b6253e5bd299f0262f1218504bc7a9f3b4fd98c609ecde4385488eec | hash=5b537b366a3ef251a1ba4649945ac5e6b2163b23eee44ab14d5774141adbf746
+  norte bloco 17 | B->F:25   | anterior=5b537b366a3ef251a1ba4649945ac5e6b2163b23eee44ab14d5774141adbf746 | hash=25bbc35c2e68a39ae30566307834bfe386db0836027ed44a703715ca3f4b04ab
+  norte bloco 18 | E->G:28   | anterior=25bbc35c2e68a39ae30566307834bfe386db0836027ed44a703715ca3f4b04ab | hash=465a1d31176d9ab7614b83eee2a84fd66be54cd063de3d00483cb564ffa348f6
+  norte bloco 19 | C->D:95   | anterior=465a1d31176d9ab7614b83eee2a84fd66be54cd063de3d00483cb564ffa348f6 | hash=7ee72ec0c230c50d0c8de4daca895e53d6e3ba6ac365372ba7b5a7379d8b8782
+  norte bloco 20 | G->D:62   | anterior=7ee72ec0c230c50d0c8de4daca895e53d6e3ba6ac365372ba7b5a7379d8b8782 | hash=2dd80fa73c4004390988007c509195d037c9387b02b344b47f1756ad33983eee
+  sul   bloco 15 | E->F:71   | anterior=a8fb30bdd0f67eec52a1adad1cc829094765bf1d137bed381d935cb381b83115 | hash=4a197186234782793e1f5fea61ca541eec19c0246a089f93a485635830f466cd
+  sul   bloco 16 | G->A:27   | anterior=4a197186234782793e1f5fea61ca541eec19c0246a089f93a485635830f466cd | hash=1210bdfcda37070cc10d4743c8b0fadaf9e25436b0c192fcd37ccf365c27b768
+  sul   bloco 17 | A->C:3    | anterior=1210bdfcda37070cc10d4743c8b0fadaf9e25436b0c192fcd37ccf365c27b768 | hash=3231ae326be3896ecfd8f38f5089bf3ce0c52a20d50137f67a6803bcc618c419
+  sul   bloco 18 | E->F:80   | anterior=3231ae326be3896ecfd8f38f5089bf3ce0c52a20d50137f67a6803bcc618c419 | hash=991e48f845763c8fbc62ce95d9c7fc80a945e6393db882c17c958887542d52c2
+  B: ramos concorrentes (fork), ancestral comum=14 -> vence norte: mais longa (21 contra 19 blocos)
+    descartado bloco 15 | E->F:71   | anterior=a8fb30bdd0f67eec52a1adad1cc829094765bf1d137bed381d935cb381b83115 | hash=4a197186234782793e1f5fea61ca541eec19c0246a089f93a485635830f466cd
+    descartado bloco 16 | G->A:27   | anterior=4a197186234782793e1f5fea61ca541eec19c0246a089f93a485635830f466cd | hash=1210bdfcda37070cc10d4743c8b0fadaf9e25436b0c192fcd37ccf365c27b768
+    descartado bloco 17 | A->C:3    | anterior=1210bdfcda37070cc10d4743c8b0fadaf9e25436b0c192fcd37ccf365c27b768 | hash=3231ae326be3896ecfd8f38f5089bf3ce0c52a20d50137f67a6803bcc618c419
+    descartado bloco 18 | E->F:80   | anterior=3231ae326be3896ecfd8f38f5089bf3ce0c52a20d50137f67a6803bcc618c419 | hash=991e48f845763c8fbc62ce95d9c7fc80a945e6393db882c17c958887542d52c2
+    transações que voltam à fila: [E->F:71, G->A:27, A->C:3, E->F:80]
+    ponta final das duas réplicas = 2dd80fa73c4004390988007c509195d037c9387b02b344b47f1756ad33983eee
+
+cenário C — empate: leste e oeste produzem 3 blocos cada
+  ponta de leste = f6917673231a1f133b17935566fe84e43f234eabeb28236518a644c647bbc7bc
+  ponta de oeste = e894f85b61f3c774275b65b1adaca0c64ba6ffe0f213af679b0f9b2761204d8f
+  C: ramos concorrentes (fork), ancestral comum=14 -> vence oeste: empate em 18 blocos; vence o menor hash da ponta
+    descartado bloco 15 | E->B:72   | anterior=a8fb30bdd0f67eec52a1adad1cc829094765bf1d137bed381d935cb381b83115 | hash=2fad1dd3e5a84bc1141f482f99f11d0634c012473e0393f4a88f19e600f8417a
+    descartado bloco 16 | D->A:91   | anterior=2fad1dd3e5a84bc1141f482f99f11d0634c012473e0393f4a88f19e600f8417a | hash=5797a0bae1069482998a360bdc6323cfce29f75986c54a631b23b0d453908dc5
+    descartado bloco 17 | F->C:71   | anterior=5797a0bae1069482998a360bdc6323cfce29f75986c54a631b23b0d453908dc5 | hash=f6917673231a1f133b17935566fe84e43f234eabeb28236518a644c647bbc7bc
+    transações que voltam à fila: [E->B:72, D->A:91, F->C:71]
+    ponta final das duas réplicas = e894f85b61f3c774275b65b1adaca0c64ba6ffe0f213af679b0f9b2761204d8f
+
+cenário D — bizantino: mallory troca "G->C:64" por "G->M:1000" no bloco 5 e acrescenta 1 bloco para ficar mais longa
+  D1: uma cópia é prefixo da outra (atraso), ancestral comum=24 -> vence honesta: cópia de mallory rejeitada: hash inválido no bloco 5
+    descartado bloco 25 | E->D:97   | anterior=8aaeebc05af1dc13ddba2144eb03a9f04ff46d1c8b3cc1b5ba5f4412ac79efe2 | hash=315b07da0efcfa41147eb10273f50db9ea24db8e76d97fce19d828395619fd2e
+    transações que voltam à fila: [E->D:97]
+    ponta final das duas réplicas = 8aaeebc05af1dc13ddba2144eb03a9f04ff46d1c8b3cc1b5ba5f4412ac79efe2
+  D2: ramos concorrentes (fork), ancestral comum=4 -> vence mallory: mais longa (26 contra 25 blocos)
+    descartado bloco 05 | G->C:64   | anterior=8f829a332307243da225efa7b7f295c5609646381c32d7f62dc732ad6fb469c0 | hash=2ced206ff4e52414313eff080cfa6204f94b1cbccc72a519712987c94c6a703a
+    descartado bloco 06 | C->B:86   | anterior=2ced206ff4e52414313eff080cfa6204f94b1cbccc72a519712987c94c6a703a | hash=1c0a658ef44ed33db5a1eca167eb77d2137311b189195dfbf7b90185364dbc6a
+    descartado bloco 07 | F->H:53   | anterior=1c0a658ef44ed33db5a1eca167eb77d2137311b189195dfbf7b90185364dbc6a | hash=90faa1d1dfc8393c4573c01f1341b6e8c737bf6104fffccd3d9dd121ff470485
+    descartado bloco 08 | A->G:31   | anterior=90faa1d1dfc8393c4573c01f1341b6e8c737bf6104fffccd3d9dd121ff470485 | hash=cc5762fef76fef9a964134f99f37155e559cdfcea3891133a7dccc2d45440ab8
+    descartado bloco 09 | A->C:75   | anterior=cc5762fef76fef9a964134f99f37155e559cdfcea3891133a7dccc2d45440ab8 | hash=c2caa427513621677f065197658deec2fdd671c49aeb47b1b5175454135cb2b0
+    descartado bloco 10 | C->A:37   | anterior=c2caa427513621677f065197658deec2fdd671c49aeb47b1b5175454135cb2b0 | hash=8c20f73bd1d4eb06078c7eba2e8f11b848c3887b9ff50aaf5b17f6515c691f12
+    descartado bloco 11 | F->E:20   | anterior=8c20f73bd1d4eb06078c7eba2e8f11b848c3887b9ff50aaf5b17f6515c691f12 | hash=e08ee448f95e37ff0ca3b1987a81cd6fbdb60981eacf54e1630b198913513c4a
+    descartado bloco 12 | B->A:54   | anterior=e08ee448f95e37ff0ca3b1987a81cd6fbdb60981eacf54e1630b198913513c4a | hash=c9feb00b5cc0b048ee624c4371b80d10c275f68d85b16186eca02dd4007c1159
+    descartado bloco 13 | E->H:10   | anterior=c9feb00b5cc0b048ee624c4371b80d10c275f68d85b16186eca02dd4007c1159 | hash=79e7ed07bf5b7d226b2e2295c8a5b7e0835319c030be2b55c3183ee0549d0acd
+    descartado bloco 14 | G->E:90   | anterior=79e7ed07bf5b7d226b2e2295c8a5b7e0835319c030be2b55c3183ee0549d0acd | hash=a8fb30bdd0f67eec52a1adad1cc829094765bf1d137bed381d935cb381b83115
+    descartado bloco 15 | C->F:29   | anterior=a8fb30bdd0f67eec52a1adad1cc829094765bf1d137bed381d935cb381b83115 | hash=b3f40a31d906f39e23597fd5c67c3aff1fe8fab2fa446e396d374974d84b362e
+    descartado bloco 16 | E->F:94   | anterior=b3f40a31d906f39e23597fd5c67c3aff1fe8fab2fa446e396d374974d84b362e | hash=b5ce257efad5451ac45ba36bcc4d3bee50577e63722688961826ffd0a26f38d7
+    descartado bloco 17 | H->E:53   | anterior=b5ce257efad5451ac45ba36bcc4d3bee50577e63722688961826ffd0a26f38d7 | hash=a4abf963b3b79d712f91486c2fbc46a720fa776711c0d50e82eb28069e210f37
+    descartado bloco 18 | D->A:55   | anterior=a4abf963b3b79d712f91486c2fbc46a720fa776711c0d50e82eb28069e210f37 | hash=f7fd85a5b13ecfa789958fed94ac09c52cb903fb2f60159931bd4aa55847e27b
+    descartado bloco 19 | A->H:37   | anterior=f7fd85a5b13ecfa789958fed94ac09c52cb903fb2f60159931bd4aa55847e27b | hash=44e2d6ed3eac868d28ae530c8bad0b4ab4818c5e628dc9d2305f824d59329c3f
+    descartado bloco 20 | B->C:48   | anterior=44e2d6ed3eac868d28ae530c8bad0b4ab4818c5e628dc9d2305f824d59329c3f | hash=71c8e44bd8bd7c4569b20510494496f0c954fb53f17368a7379fa5a8ff9deaae
+    descartado bloco 21 | E->D:75   | anterior=71c8e44bd8bd7c4569b20510494496f0c954fb53f17368a7379fa5a8ff9deaae | hash=e9c30615f5d1250fd2e02a260f5c5ab24264c05bdd4d907083f8600a5bda8443
+    descartado bloco 22 | G->A:56   | anterior=e9c30615f5d1250fd2e02a260f5c5ab24264c05bdd4d907083f8600a5bda8443 | hash=7592f03f319b146ba4a047f7b78276fbc78772bf5c56f7ee48878ad9d16d3a5e
+    descartado bloco 23 | D->C:92   | anterior=7592f03f319b146ba4a047f7b78276fbc78772bf5c56f7ee48878ad9d16d3a5e | hash=67e8c2893edea0358aeebebb166a0db36685b82b94c58f76d540d940f5646510
+    descartado bloco 24 | F->B:73   | anterior=67e8c2893edea0358aeebebb166a0db36685b82b94c58f76d540d940f5646510 | hash=8aaeebc05af1dc13ddba2144eb03a9f04ff46d1c8b3cc1b5ba5f4412ac79efe2
+    transações que voltam à fila: [G->C:64]
+    ponta final das duas réplicas = f3aafcfbf54092bb843618e75743b05c028966117ce34d7f4be5c3ac7ce8de5c

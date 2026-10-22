@@ -1,0 +1,4 @@
+bloco 01 | E->B:38   -> E->B:1000 | armazenado=dfe17b083a9b941da9703db24a65359786f781d1ffb7ea83123f939e4363a8a7 | recalculado=d3bd1b276515fc75396834856dc8d9a423a145883abb8c42fb55670052044c33 | hash inválido no bloco 1 | auditoria=[1]
+bloco 05 | G->C:64   -> G->C:1000 | armazenado=2ced206ff4e52414313eff080cfa6204f94b1cbccc72a519712987c94c6a703a | recalculado=b66da1e54af2aa415a210f8aa832d1f63dbabf87e500a165dfd4a0f7f1faea48 | hash inválido no bloco 5 | auditoria=[5]
+bloco 12 | B->A:54   -> B->A:1000 | armazenado=c9feb00b5cc0b048ee624c4371b80d10c275f68d85b16186eca02dd4007c1159 | recalculado=217a83da604bc71905bf368c3516bb570063d502ee5a5cc3054ee6f249a9f78f | hash inválido no bloco 12 | auditoria=[12]
+bloco 23 | D->C:92   -> D->C:1000 | armazenado=67e8c2893edea0358aeebebb166a0db36685b82b94c58f76d540d940f5646510 | recalculado=74039cd464e2ac3a1e213d55946c5ab5d6e2dbc3f6db6caee9be64ecacc2628d | hash inválido no bloco 23 | auditoria=[23]

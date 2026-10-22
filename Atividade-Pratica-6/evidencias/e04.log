@@ -1,0 +1,34 @@
+estágio 0 | nenhuma (referência)                     | recalculados= 0 | cadeia válida              | ponta=8aaeebc05af1dc13ddba2144eb03a9f04ff46d1c8b3cc1b5ba5f4412ac79efe2
+estágio 1 | troca os dados do bloco 5                | recalculados= 0 | hash inválido no bloco 5   | ponta=8aaeebc05af1dc13ddba2144eb03a9f04ff46d1c8b3cc1b5ba5f4412ac79efe2
+estágio 2 | recalcula só o hash do bloco 5           | recalculados= 1 | ligação inválida no bloco 6 | ponta=8aaeebc05af1dc13ddba2144eb03a9f04ff46d1c8b3cc1b5ba5f4412ac79efe2
+estágio 3 | recalcula os blocos 5 a 24               | recalculados=20 | cadeia válida              | ponta=f6085c424d0295f424f51d05bb1e3334314ba5baf47539552c3b2cb7886c8f60
+
+referência x reescrita
+bloco 03 | referência=ad1d1370743b49f27036dc2dea5093b36b6371873c516b85a72d33ec609f7c34 | reescrita=ad1d1370743b49f27036dc2dea5093b36b6371873c516b85a72d33ec609f7c34 | igual
+bloco 04 | referência=8f829a332307243da225efa7b7f295c5609646381c32d7f62dc732ad6fb469c0 | reescrita=8f829a332307243da225efa7b7f295c5609646381c32d7f62dc732ad6fb469c0 | igual
+bloco 05 | referência=2ced206ff4e52414313eff080cfa6204f94b1cbccc72a519712987c94c6a703a | reescrita=b66da1e54af2aa415a210f8aa832d1f63dbabf87e500a165dfd4a0f7f1faea48 | diferente
+bloco 06 | referência=1c0a658ef44ed33db5a1eca167eb77d2137311b189195dfbf7b90185364dbc6a | reescrita=e4a514deca0df6bec3da05b4afdf759fadce2abc1965d2f8c83cb0455a59ddff | diferente
+bloco 07 | referência=90faa1d1dfc8393c4573c01f1341b6e8c737bf6104fffccd3d9dd121ff470485 | reescrita=401db9941d4e59ee5b9cbfcdc64b8bd78d8804fb588175289a62cc4c778f24ed | diferente
+bloco 08 | referência=cc5762fef76fef9a964134f99f37155e559cdfcea3891133a7dccc2d45440ab8 | reescrita=0f587759c0f5bdc0ad77c47139eea67306c7290238db776aebb18104ba739acc | diferente
+bloco 09 | referência=c2caa427513621677f065197658deec2fdd671c49aeb47b1b5175454135cb2b0 | reescrita=b5b5057f5081648cab7ff511189651be99d82622f533ce3ac516129eb159a06e | diferente
+bloco 10 | referência=8c20f73bd1d4eb06078c7eba2e8f11b848c3887b9ff50aaf5b17f6515c691f12 | reescrita=0835abc6281387a02bde62257b2a085aac8017467d88817e68f7b285b57cd17f | diferente
+bloco 11 | referência=e08ee448f95e37ff0ca3b1987a81cd6fbdb60981eacf54e1630b198913513c4a | reescrita=a65fe0188d7f135399f1ceb6b9e49b3042475ad3e234a879592fd751d463373e | diferente
+bloco 12 | referência=c9feb00b5cc0b048ee624c4371b80d10c275f68d85b16186eca02dd4007c1159 | reescrita=fb0c00905d36839dac2f4ede47126d8b8c452bbbfb6deb3699c592e8eac2d5b3 | diferente
+bloco 13 | referência=79e7ed07bf5b7d226b2e2295c8a5b7e0835319c030be2b55c3183ee0549d0acd | reescrita=fdc4fdd752c001a4c9aee157e92443b6e1674d11c791ed13ad12a903b46776a1 | diferente
+bloco 14 | referência=a8fb30bdd0f67eec52a1adad1cc829094765bf1d137bed381d935cb381b83115 | reescrita=0480ea402b797bd0c2f3907a00ad98a203f5f3320fbcf35be760fd6a84aca3fd | diferente
+bloco 15 | referência=b3f40a31d906f39e23597fd5c67c3aff1fe8fab2fa446e396d374974d84b362e | reescrita=d53a3128a4f192a2940464a75fd838ec0b81ac01259ffc641bfe02b3231bf1e1 | diferente
+bloco 16 | referência=b5ce257efad5451ac45ba36bcc4d3bee50577e63722688961826ffd0a26f38d7 | reescrita=4bbe44a59dbe583117017839c98a3557ab192218f997904b45dd5c3f218438aa | diferente
+bloco 17 | referência=a4abf963b3b79d712f91486c2fbc46a720fa776711c0d50e82eb28069e210f37 | reescrita=f94207a59f66656f04bbffc2f69cf18fe0270259c0f81f646e8c23355038297c | diferente
+bloco 18 | referência=f7fd85a5b13ecfa789958fed94ac09c52cb903fb2f60159931bd4aa55847e27b | reescrita=22a70e4fb9f2b7b2aef0cc05e069e7690aa37528f77faa4744539f78367ab046 | diferente
+bloco 19 | referência=44e2d6ed3eac868d28ae530c8bad0b4ab4818c5e628dc9d2305f824d59329c3f | reescrita=980b5d86affe3079c2fc078a184b241d9318af451f37077218b7b72aad04cea6 | diferente
+bloco 20 | referência=71c8e44bd8bd7c4569b20510494496f0c954fb53f17368a7379fa5a8ff9deaae | reescrita=013edf6d9cb64726040c73abeb2641737ba482ff5b3cd5dbc91b5b4dbdd6d7b5 | diferente
+bloco 21 | referência=e9c30615f5d1250fd2e02a260f5c5ab24264c05bdd4d907083f8600a5bda8443 | reescrita=c1135dd2bdbf7af523ae1b5a1c1004dedfb90796156506d4f4232d5e2b630d14 | diferente
+bloco 22 | referência=7592f03f319b146ba4a047f7b78276fbc78772bf5c56f7ee48878ad9d16d3a5e | reescrita=d8f140f820b3befac028842a33d44974b17b6846db313067a3f4a1f4ee3f38b0 | diferente
+bloco 23 | referência=67e8c2893edea0358aeebebb166a0db36685b82b94c58f76d540d940f5646510 | reescrita=769520a88d647fd9238c9a2c22c5d0ffcae17475cc0227a9494a9ed86ea274db | diferente
+bloco 24 | referência=8aaeebc05af1dc13ddba2144eb03a9f04ff46d1c8b3cc1b5ba5f4412ac79efe2 | reescrita=f6085c424d0295f424f51d05bb1e3334314ba5baf47539552c3b2cb7886c8f60 | diferente
+detector de fork: ancestral comum=4, ramos de 20 e 20 blocos, tipo=ramos concorrentes (fork)
+
+custo | bloco 01 fraudado | 24 hashes recalculados | válida=true
+custo | bloco 05 fraudado | 20 hashes recalculados | válida=true
+custo | bloco 12 fraudado | 13 hashes recalculados | válida=true
+custo | bloco 23 fraudado |  2 hashes recalculados | válida=true
