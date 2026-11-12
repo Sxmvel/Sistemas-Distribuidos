@@ -1,0 +1,123 @@
+syntax = "proto3";
+
+package barragem;
+
+option java_package = "br.sd.barragem.contrato";
+option java_multiple_files = true;
+
+enum Nivel {
+  normal = 0;
+  atencao = 1;
+  n1 = 2;
+  n2 = 3;
+  n3 = 4;
+}
+
+enum Modo {
+  honesto = 0;
+  malicioso = 1;
+  intermitente = 2;
+}
+
+message Vazio {}
+
+message PedidoEstado {
+  string cliente = 1;
+}
+
+message LeituraSensor {
+  string sensor_id = 1;
+  string tipo = 2;
+  double valor = 3;
+  string unidade = 4;
+  int32 severidade = 5;
+  int64 instante = 6;
+  repeated double limiares = 7;
+}
+
+message EstadoAtuador {
+  string atuador_id = 1;
+  string tipo = 2;
+  string estado = 3;
+  repeated string apoiadores = 4;
+  int64 instante = 5;
+}
+
+message EstadoPar {
+  int32 id = 1;
+  bool vivo = 2;
+  bool quarentena = 3;
+  Nivel nivel = 4;
+  int64 ultimo_seq = 5;
+}
+
+message EstadoSistema {
+  int32 controlador_id = 1;
+  int32 lider_id = 2;
+  Nivel nivel = 3;
+  Nivel nivel_automatico = 4;
+  bool evacuacao_manual = 5;
+  bool alarme_reconhecido = 6;
+  repeated LeituraSensor sensores = 7;
+  repeated EstadoAtuador atuadores = 8;
+  repeated EstadoPar pares = 9;
+  int64 ultimo_seq = 10;
+  int64 leituras_descartadas = 11;
+  repeated string motivos = 12;
+  int64 instante = 13;
+}
+
+message PedidoComando {
+  string requisicao_id = 1;
+  string operador = 2;
+  string motivo = 3;
+}
+
+message RespostaComando {
+  bool sucesso = 1;
+  string mensagem = 2;
+  int64 seq = 3;
+  int32 executado_por = 4;
+  bool repetida = 5;
+}
+
+message PedidoAuditoria {
+  int32 limite = 1;
+}
+
+message EventoAuditoria {
+  int64 seq = 1;
+  int64 instante = 2;
+  string tipo = 3;
+  string descricao = 4;
+  string origem = 5;
+}
+
+message ListaAuditoria {
+  int32 controlador_id = 1;
+  repeated EventoAuditoria eventos = 2;
+}
+
+message PedidoModo {
+  Modo modo = 1;
+}
+
+message RespostaLaboratorio {
+  int32 controlador_id = 1;
+  string mensagem = 2;
+}
+
+service ServicoBarragem {
+  rpc ObterEstado (PedidoEstado) returns (EstadoSistema);
+  rpc AcompanharEstado (PedidoEstado) returns (stream EstadoSistema);
+  rpc AcionarEvacuacao (PedidoComando) returns (RespostaComando);
+  rpc ReconhecerAlarme (PedidoComando) returns (RespostaComando);
+  rpc EncerrarEvacuacao (PedidoComando) returns (RespostaComando);
+  rpc ListarAuditoria (PedidoAuditoria) returns (ListaAuditoria);
+}
+
+service ServicoLaboratorio {
+  rpc DefinirModo (PedidoModo) returns (RespostaLaboratorio);
+  rpc FalharNoProximoComando (Vazio) returns (RespostaLaboratorio);
+  rpc Desligar (Vazio) returns (RespostaLaboratorio);
+}

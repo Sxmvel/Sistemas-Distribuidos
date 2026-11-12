@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package barragem;
+
+import "barragem.proto";
+
+option java_package = "br.sd.barragem.contrato";
+option java_multiple_files = true;
+
+message PedidoPing {
+  int32 origem = 1;
+}
+
+message RespostaPing {
+  int32 id = 1;
+  Nivel nivel = 2;
+  int64 ultimo_seq = 3;
+  repeated int32 quarentena = 4;
+  int64 instante = 5;
+}
+
+message Operacao {
+  int64 seq = 1;
+  string requisicao_id = 2;
+  string tipo = 3;
+  string operador = 4;
+  string motivo = 5;
+  int64 instante = 6;
+  int32 lider_id = 7;
+}
+
+message ConfirmacaoReplicacao {
+  bool aceita = 1;
+  int64 ultimo_seq = 2;
+}
+
+message PedidoSincronizacao {
+  int64 desde_seq = 1;
+}
+
+message ListaOperacoes {
+  repeated Operacao operacoes = 1;
+}
+
+message ComandoEncaminhado {
+  string tipo = 1;
+  PedidoComando pedido = 2;
+  int32 origem = 3;
+}
+
+service ServicoReplicacao {
+  rpc Ping (PedidoPing) returns (RespostaPing);
+  rpc Replicar (Operacao) returns (ConfirmacaoReplicacao);
+  rpc Sincronizar (PedidoSincronizacao) returns (ListaOperacoes);
+  rpc EncaminharComando (ComandoEncaminhado) returns (RespostaComando);
+}
