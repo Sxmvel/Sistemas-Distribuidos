@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: sensores
+  main:
+    banner-mode: off
+    keep-alive: true
+
+mqtt:
+  url: tcp://localhost:1883
+
+sensores:
+  intervalo-ms: 1000
+
+logging:
+  pattern:
+    console: "%d{HH:mm:ss} %-5level [sensores] %msg%n"
+  level:
+    root: warn
+    br.sd.barragem: info

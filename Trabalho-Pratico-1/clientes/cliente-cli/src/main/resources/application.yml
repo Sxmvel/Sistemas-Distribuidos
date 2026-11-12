@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: cliente-cli
+  main:
+    banner-mode: off
+    log-startup-info: false
+
+logging:
+  level:
+    root: error

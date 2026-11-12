@@ -1,0 +1,44 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "TP1: compilar",
+            "type": "process",
+            "command": "powershell",
+            "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/Trabalho-Pratico-1/scripts/compilar.ps1"],
+            "group": "build",
+            "problemMatcher": [],
+            "presentation": { "reveal": "always", "panel": "shared", "clear": true }
+        },
+        {
+            "label": "TP1: iniciar tudo (janelas)",
+            "type": "process",
+            "command": "powershell",
+            "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/Trabalho-Pratico-1/scripts/iniciar-tudo.ps1", "-LimparDados"],
+            "dependsOn": "TP1: compilar",
+            "problemMatcher": []
+        },
+        {
+            "label": "TP1: iniciar tudo + CLI (janelas)",
+            "type": "process",
+            "command": "powershell",
+            "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/Trabalho-Pratico-1/scripts/iniciar-tudo.ps1", "-LimparDados", "-ComCli"],
+            "dependsOn": "TP1: compilar",
+            "problemMatcher": []
+        },
+        {
+            "label": "TP1: parar tudo",
+            "type": "process",
+            "command": "powershell",
+            "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/Trabalho-Pratico-1/scripts/parar-tudo.ps1"],
+            "problemMatcher": []
+        },
+        {
+            "label": "TP1: parar tudo e limpar dados",
+            "type": "process",
+            "command": "powershell",
+            "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/Trabalho-Pratico-1/scripts/parar-tudo.ps1", "-LimparDados"],
+            "problemMatcher": []
+        }
+    ]
+}

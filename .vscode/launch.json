@@ -1,0 +1,119 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "TP1: Broker MQTT",
+            "request": "launch",
+            "mainClass": "br.sd.barragem.broker.BrokerMqttApplication",
+            "projectName": "broker-mqtt",
+            "cwd": "${workspaceFolder}/Trabalho-Pratico-1",
+            "vmArgs": "-Dstdout.encoding=UTF-8 -Dstderr.encoding=UTF-8 -Dbarragem.componente=broker",
+            "console": "internalConsole"
+        },
+        {
+            "type": "java",
+            "name": "TP1: Atuadores",
+            "request": "launch",
+            "mainClass": "br.sd.barragem.atuadores.AtuadoresApplication",
+            "projectName": "atuadores",
+            "cwd": "${workspaceFolder}/Trabalho-Pratico-1",
+            "vmArgs": "-Dstdout.encoding=UTF-8 -Dstderr.encoding=UTF-8 -Dbarragem.componente=atuadores",
+            "console": "internalConsole"
+        },
+        {
+            "type": "java",
+            "name": "TP1: Controlador c1",
+            "request": "launch",
+            "mainClass": "br.sd.barragem.controlador.ControladorApplication",
+            "projectName": "controlador",
+            "cwd": "${workspaceFolder}/Trabalho-Pratico-1",
+            "args": "--spring.profiles.active=c1",
+            "vmArgs": "-Dstdout.encoding=UTF-8 -Dstderr.encoding=UTF-8 -Dbarragem.componente=controladorc1",
+            "console": "internalConsole"
+        },
+        {
+            "type": "java",
+            "name": "TP1: Controlador c2",
+            "request": "launch",
+            "mainClass": "br.sd.barragem.controlador.ControladorApplication",
+            "projectName": "controlador",
+            "cwd": "${workspaceFolder}/Trabalho-Pratico-1",
+            "args": "--spring.profiles.active=c2",
+            "vmArgs": "-Dstdout.encoding=UTF-8 -Dstderr.encoding=UTF-8 -Dbarragem.componente=controladorc2",
+            "console": "internalConsole"
+        },
+        {
+            "type": "java",
+            "name": "TP1: Controlador c3",
+            "request": "launch",
+            "mainClass": "br.sd.barragem.controlador.ControladorApplication",
+            "projectName": "controlador",
+            "cwd": "${workspaceFolder}/Trabalho-Pratico-1",
+            "args": "--spring.profiles.active=c3",
+            "vmArgs": "-Dstdout.encoding=UTF-8 -Dstderr.encoding=UTF-8 -Dbarragem.componente=controladorc3",
+            "console": "internalConsole"
+        },
+        {
+            "type": "java",
+            "name": "TP1: Sensores",
+            "request": "launch",
+            "mainClass": "br.sd.barragem.sensores.SensoresApplication",
+            "projectName": "sensores",
+            "cwd": "${workspaceFolder}/Trabalho-Pratico-1",
+            "vmArgs": "-Dstdout.encoding=UTF-8 -Dstderr.encoding=UTF-8 -Dbarragem.componente=sensores",
+            "console": "internalConsole"
+        },
+        {
+            "type": "java",
+            "name": "TP1: Painel web (Cliente 1)",
+            "request": "launch",
+            "mainClass": "br.sd.barragem.painel.PainelWebApplication",
+            "projectName": "painel-web",
+            "cwd": "${workspaceFolder}/Trabalho-Pratico-1",
+            "vmArgs": "-Dstdout.encoding=UTF-8 -Dstderr.encoding=UTF-8 -Dbarragem.componente=painel",
+            "console": "internalConsole"
+        },
+        {
+            "type": "java",
+            "name": "TP1: CLI Defesa Civil (Cliente 2)",
+            "request": "launch",
+            "mainClass": "br.sd.barragem.cli.ClienteCliApplication",
+            "projectName": "cliente-cli",
+            "cwd": "${workspaceFolder}/Trabalho-Pratico-1",
+            "vmArgs": "-Dbarragem.componente=cli",
+            "console": "integratedTerminal"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "TP1: sistema completo",
+            "configurations": [
+                "TP1: Broker MQTT",
+                "TP1: Atuadores",
+                "TP1: Controlador c1",
+                "TP1: Controlador c2",
+                "TP1: Controlador c3",
+                "TP1: Sensores",
+                "TP1: Painel web (Cliente 1)"
+            ],
+            "preLaunchTask": "TP1: compilar",
+            "stopAll": true
+        },
+        {
+            "name": "TP1: sistema completo + CLI",
+            "configurations": [
+                "TP1: Broker MQTT",
+                "TP1: Atuadores",
+                "TP1: Controlador c1",
+                "TP1: Controlador c2",
+                "TP1: Controlador c3",
+                "TP1: Sensores",
+                "TP1: Painel web (Cliente 1)",
+                "TP1: CLI Defesa Civil (Cliente 2)"
+            ],
+            "preLaunchTask": "TP1: compilar",
+            "stopAll": true
+        }
+    ]
+}

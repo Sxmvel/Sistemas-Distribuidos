@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: painel-web
+  main:
+    banner-mode: off
+  mvc:
+    async:
+      request-timeout: -1
+  web:
+    resources:
+      cache:
+        cachecontrol:
+          no-cache: true
+
+server:
+  port: 8080
+
+mqtt:
+  url: tcp://localhost:1883
+
+laboratorio:
+  raiz: .
+
+logging:
+  pattern:
+    console: "%d{HH:mm:ss} %-5level [painel] %msg%n"
+  level:
+    root: warn
+    br.sd.barragem: info
+    org.springframework.boot.web.embedded.tomcat: info

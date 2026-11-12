@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: broker-mqtt
+  main:
+    banner-mode: off
+    keep-alive: true
+
+broker:
+  porta: 1883
+
+logging:
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %-5level [broker] %msg%n"
+  level:
+    root: warn
+    br.sd.barragem: info
