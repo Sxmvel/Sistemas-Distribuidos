@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Centro de Monitoramento — Barragem</title>
+    <link rel="stylesheet" href="css/painel.css">
+</head>
+<body data-nivel="normal">
+<header class="topo">
+    <div class="marca">
+        <div class="marca-titulo">Centro de Monitoramento</div>
+        <div class="marca-sub" id="nome-barragem">Barragem Serra Azul (fictícia)</div>
+    </div>
+    <div class="nivel-banner" id="nivel-banner">
+        <span class="nivel-rotulo" id="nivel-rotulo">—</span>
+        <span class="nivel-detalhe" id="nivel-detalhe">aguardando réplicas…</span>
+    </div>
+    <div class="topo-status">
+        <button class="botao mini botao-som convite" id="botao-som" type="button">Ativar som</button>
+        <div><span class="ponto" id="ponto-conexao"></span><span id="texto-conexao">conectando</span></div>
+        <div>Líder <strong id="lider-atual">—</strong></div>
+        <div class="relogio" id="relogio">--:--:--</div>
+    </div>
+</header>
+
+<main class="grade">
+    <section class="cartao area-barragem">
+        <div class="cartao-cabecalho">
+            <h2>Seção transversal</h2>
+            <span class="etiqueta" id="cenario-atual">cenário: normal</span>
+        </div>
+        <svg id="desenho-barragem" viewBox="0 0 900 340" role="img" aria-label="Seção transversal da barragem">
+            <defs>
+                <linearGradient id="ceu" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="var(--ceu-topo)"/>
+                    <stop offset="1" stop-color="var(--ceu-base)"/>
+                </linearGradient>
+                <linearGradient id="rejeito" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#7a6a4f"/>
+                    <stop offset="1" stop-color="#4a3f2e"/>
+                </linearGradient>
+                <pattern id="textura-macico" width="10" height="10" patternUnits="userSpaceOnUse">
+                    <rect width="10" height="10" fill="#9a7b55"/>
+                    <circle cx="3" cy="3" r="1" fill="#86683f"/>
+                    <circle cx="8" cy="7" r="0.8" fill="#86683f"/>
+                </pattern>
+            </defs>
+            <rect width="900" height="340" fill="url(#ceu)"/>
+            <g id="chuva" class="chuva"></g>
+            <g id="nuvem" transform="translate(70,22)">
+                <ellipse cx="50" cy="22" rx="48" ry="17" class="nuvem"/>
+                <ellipse cx="85" cy="16" rx="30" ry="14" class="nuvem"/>
+                <ellipse cx="22" cy="18" rx="22" ry="12" class="nuvem"/>
+            </g>
+            <rect x="0" y="300" width="900" height="40" class="solo"/>
+            <rect id="reservatorio" x="0" y="190" width="420" height="110" fill="url(#rejeito)"/>
+            <path id="linha-agua" d="M0 190 H420" class="linha-agua"/>
+            <polygon id="macico" points="300,300 360,130 430,130 480,175 500,175 550,225 570,225 625,300"
+                     fill="url(#textura-macico)" class="macico"/>
+            <path id="trinca" d="M455 150 L470 178 L462 200 L480 232 L470 262" class="trinca"/>
+            <path d="M625 300 Q700 292 900 296" class="rio"/>
+            <g id="vila" transform="translate(770,262)">
+                <polygon points="0,20 14,6 28,20" class="telhado"/><rect x="3" y="20" width="22" height="16" class="casa"/>
+                <polygon points="34,20 48,6 62,20" class="telhado"/><rect x="37" y="20" width="22" height="16" class="casa"/>
+                <polygon points="68,22 80,10 92,22" class="telhado"/><rect x="71" y="22" width="18" height="14" class="casa"/>
+                <text x="46" y="52" class="legenda-svg" text-anchor="middle">Vila Esperança</text>
+            </g>
+            <g id="svg-SR-01" class="sirene-svg" transform="translate(745,236)">
+                <rect x="-1.5" y="0" width="3" height="56" class="poste"/>
+                <circle cx="0" cy="0" r="7" class="sirene-corpo"/>
+                <path d="M10 -8 Q18 0 10 8" class="onda o1"/><path d="M16 -14 Q28 0 16 14" class="onda o2"/>
+                <path d="M-10 -8 Q-18 0 -10 8" class="onda o1"/><path d="M-16 -14 Q-28 0 -16 14" class="onda o2"/>
+            </g>
+            <g id="svg-SR-02" class="sirene-svg" transform="translate(875,232)">
+                <rect x="-1.5" y="0" width="3" height="60" class="poste"/>
+                <circle cx="0" cy="0" r="7" class="sirene-corpo"/>
+                <path d="M-10 -8 Q-18 0 -10 8" class="onda o1"/><path d="M-16 -14 Q-28 0 -16 14" class="onda o2"/>
+            </g>
+            <g id="svg-PR-01" transform="translate(676,246)">
+                <rect x="-1.5" y="18" width="3" height="36" class="poste"/>
+                <rect x="-34" y="0" width="68" height="20" rx="3" class="placa"/>
+                <text id="svg-PR-01-texto" x="0" y="14" text-anchor="middle" class="placa-texto">LIVRE</text>
+            </g>
+            <g id="svg-CN-01" transform="translate(640,292)">
+                <rect x="-4" y="-14" width="8" height="14" class="poste"/>
+                <rect id="braco-cancela" x="0" y="-13" width="44" height="5" class="braco"/>
+            </g>
+            <g id="svg-BR-01" transform="translate(375,112)">
+                <rect x="-9" y="-12" width="18" height="14" rx="2" class="bomba"/>
+                <rect x="-1.5" y="2" width="3" height="40" class="tubo"/>
+                <text x="0" y="-16" text-anchor="middle" class="legenda-svg">bomba</text>
+            </g>
+            <g id="marcadores"></g>
+            <text x="200" y="324" class="legenda-svg" text-anchor="middle">reservatório de rejeito</text>
+            <text x="465" y="324" class="legenda-svg" text-anchor="middle">maciço</text>
+            <text x="760" y="324" class="legenda-svg" text-anchor="middle">vale a jusante (ZAS)</text>
+        </svg>
+        <div class="motivos" id="motivos"></div>
+    </section>
+
+    <section class="cartao area-replicas">
+        <div class="cartao-cabecalho">
+            <h2>Controladores (réplicas)</h2>
+            <span class="etiqueta" id="consenso">—</span>
+        </div>
+        <div id="controladores" class="lista-controladores"></div>
+        <p class="nota">O painel consulta as 3 réplicas por gRPC a cada segundo e só aceita o nível informado pela maioria. Valores de sensores usam a mediana.</p>
+    </section>
+
+    <section class="cartao area-sensores">
+        <div class="cartao-cabecalho">
+            <h2>Sensores</h2>
+            <span class="etiqueta" id="descartadas">0 leituras descartadas</span>
+        </div>
+        <div id="sensores" class="grade-sensores"></div>
+    </section>
+
+    <section class="cartao area-atuadores">
+        <div class="cartao-cabecalho">
+            <h2>Atuadores</h2>
+            <span class="etiqueta">quórum ≥ 2 controladores</span>
+        </div>
+        <div id="atuadores" class="lista-atuadores"></div>
+    </section>
+
+    <section class="cartao area-operacao">
+        <div class="cartao-cabecalho">
+            <h2>Operação</h2>
+            <span class="etiqueta" id="estado-operacao">—</span>
+        </div>
+        <div class="campos">
+            <label>Operador<input id="operador" value="centro-monitoramento"></label>
+            <label>Motivo<input id="motivo" placeholder="opcional"></label>
+        </div>
+        <div class="botoes">
+            <button class="botao perigo" data-comando="acionarEvacuacao">Acionar evacuação</button>
+            <button class="botao" data-comando="reconhecerAlarme">Reconhecer alarme</button>
+            <button class="botao" data-comando="encerrarEvacuacao">Encerrar evacuação</button>
+        </div>
+        <button class="botao demonstracao" id="evacuar-com-queda">Acionar evacuação derrubando o líder no meio</button>
+        <div class="rastro" id="rastro">
+            <div class="rastro-titulo">Rastro da última requisição</div>
+            <div class="rastro-vazio">Nenhum comando enviado ainda.</div>
+        </div>
+    </section>
+
+    <section class="cartao area-laboratorio">
+        <div class="cartao-cabecalho">
+            <h2>Laboratório</h2>
+            <span class="etiqueta">simulação de campo</span>
+        </div>
+        <div class="sub">Cenário dos sensores</div>
+        <div class="botoes cenarios">
+            <button class="botao" data-cenario="normal">Normal</button>
+            <button class="botao" data-cenario="chuvaIntensa">Chuva intensa</button>
+            <button class="botao" data-cenario="ruptura">Ruptura</button>
+            <button class="botao" data-cenario="recuperacao">Recuperação</button>
+        </div>
+        <div class="sub">Ataques e falhas de sensor</div>
+        <div class="botoes">
+            <button class="botao" id="injetar-forjada">Leitura forjada (HMAC inválido)</button>
+            <div class="grupo">
+                <select id="sensor-pico"></select>
+                <button class="botao" id="injetar-pico">Pico espúrio</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="cartao area-eventos">
+        <div class="cartao-cabecalho">
+            <h2>Linha do tempo</h2>
+            <span class="etiqueta" id="fonte-eventos">auditoria do líder</span>
+        </div>
+        <ol id="eventos" class="eventos"></ol>
+    </section>
+</main>
+
+<div id="avisos" class="avisos" aria-live="polite"></div>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
