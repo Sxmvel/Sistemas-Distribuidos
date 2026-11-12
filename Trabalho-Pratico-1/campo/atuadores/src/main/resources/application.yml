@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: atuadores
+  main:
+    banner-mode: off
+    keep-alive: true
+
+mqtt:
+  url: tcp://localhost:1883
+
+atuadores:
+  quorum: 2
+  validade-voto-ms: 3000
+  janela-replay-ms: 10000
+
+logging:
+  pattern:
+    console: "%d{HH:mm:ss} %-5level [atuadores] %msg%n"
+  level:
+    root: warn
+    br.sd.barragem: info
