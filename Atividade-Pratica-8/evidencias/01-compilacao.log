@@ -1,0 +1,7 @@
+# Compilação
+
+> forge build --force
+Compiling 22 files with Solc 0.8.28
+Solc 0.8.28 finished in 6.00s
+Compiler run successful!
+  [ok] contrato compila

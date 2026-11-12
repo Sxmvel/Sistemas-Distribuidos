@@ -1,0 +1,64 @@
+# Tentativas inválidas e revert
+
+Sem --gas-limit, o cast estima o gas antes de assinar. A estimativa executa a chamada,
+encontra o revert e a transação nem é enviada.
+
+- intruso tenta cadastrar livro
+  cast send <contrato> "cadastrarLivro(string,uint32)" Livro Falso 100  (assinada por: intruso)
+  saída do cast: Error: Failed to estimate gas: server returned an error response: error code 3: execution reverted: custom error 0xdc47e6a9: 00000000000000000000000015d34aaf54267db7d7c367839aaf71a00a2c6a65, data: "0xdc47e6a900000000000000000000000015d34aaf54267db7d7c367839aaf71a00a2c6a65": SomenteBibliotecario(0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65)
+  [ok] intruso tenta cadastrar livro -> revert SomenteBibliotecario
+  [ok] nenhuma transação chegou à cadeia (bloco 10 -> 10)
+
+- Ana tenta registrar a própria devolução
+  cast send <contrato> "devolver(uint256,address)" 2 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC  (assinada por: ana)
+  saída do cast: Error: Failed to estimate gas: server returned an error response: error code 3: execution reverted: custom error 0xdc47e6a9: 0000000000000000000000003c44cdddb6a900fa2b585dd299e03d12fa4293bc, data: "0xdc47e6a90000000000000000000000003c44cdddb6a900fa2b585dd299e03d12fa4293bc": SomenteBibliotecario(0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC)
+  [ok] Ana tenta registrar a própria devolução -> revert SomenteBibliotecario
+  [ok] nenhuma transação chegou à cadeia (bloco 10 -> 10)
+
+- bibliotecária tenta se autopromover a dono das permissões
+  cast send <contrato> "definirBibliotecario(address,bool)" 0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65 true  (assinada por: bibliotecaria)
+  saída do cast: Error: Failed to estimate gas: server returned an error response: error code 3: execution reverted: custom error 0x52c00efe: 00000000000000000000000070997970c51812dc3a010c7d01b50e0d17dc79c8, data: "0x52c00efe00000000000000000000000070997970c51812dc3a010c7d01b50e0d17dc79c8": SomenteDono(0x70997970C51812dc3A010C7d01b50e0d17dc79C8)
+  [ok] bibliotecária tenta se autopromover a dono das permissões -> revert SomenteDono
+  [ok] nenhuma transação chegou à cadeia (bloco 10 -> 10)
+
+- bibliotecária empresta livro sem exemplar disponível
+  cast send <contrato> "emprestar(uint256,address)" 2 0x90F79bf6EB2c4f870365E785982E1f101E93b906  (assinada por: bibliotecaria)
+  saída do cast: Error: Failed to estimate gas: server returned an error response: error code 3: execution reverted: [, data: "0x0c0a1e5b0000000000000000000000000000000000000000000000000000000000000002": SemExemplarDisponivel(2)
+  [ok] bibliotecária empresta livro sem exemplar disponível -> revert SemExemplarDisponivel
+  [ok] nenhuma transação chegou à cadeia (bloco 10 -> 10)
+
+- bibliotecária registra devolução duplicada
+  cast send <contrato> "devolver(uint256,address)" 1 0x90F79bf6EB2c4f870365E785982E1f101E93b906  (assinada por: bibliotecaria)
+  saída do cast: Error: Failed to estimate gas: server returned an error response: error code 3: execution reverted: custom error 0x64a29e5f: 000000000000000000000000000000000000000000000000000000000000000100000000000000000000000090f79bf6eb2c4f870365e785982e1f101e93b906, data: "0x64a29e5f000000000000000000000000000000000000000000000000000000000000000100000000000000000000000090f79bf6eb2c4f870365e785982e1f101e93b906": EmprestimoInexistente(1, 0x90F79bf6EB2c4f870365E785982E1f101E93b906)
+  [ok] bibliotecária registra devolução duplicada -> revert EmprestimoInexistente
+  [ok] nenhuma transação chegou à cadeia (bloco 10 -> 10)
+
+- Ana tenta renovar empréstimo atrasado
+  cast send <contrato> "renovar(uint256)" 2  (assinada por: ana)
+  saída do cast: Error: Failed to estimate gas: server returned an error response: error code 3: execution reverted: custom error 0xec7a1616: 00000000000000000000000000000000000000000000000000000000000000020000000000000000000000003c44cdddb6a900fa2b585dd299e03d12fa4293bc, data: "0xec7a161600000000000000000000000000000000000000000000000000000000000000020000000000000000000000003c44cdddb6a900fa2b585dd299e03d12fa4293bc": EmprestimoAtrasado(2, 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC)
+  [ok] Ana tenta renovar empréstimo atrasado -> revert EmprestimoAtrasado
+  [ok] nenhuma transação chegou à cadeia (bloco 10 -> 10)
+
+- bibliotecária cadastra livro sem título
+  cast send <contrato> "cadastrarLivro(string,uint32)"  1  (assinada por: bibliotecaria)
+  saída do cast: Error: Failed to estimate gas: server returned an error response: error code 3: execution reverted: custom error 0x97fad67a, data: "0x97fad67a": TituloInvalido
+  [ok] bibliotecária cadastra livro sem título -> revert TituloInvalido
+  [ok] nenhuma transação chegou à cadeia (bloco 10 -> 10)
+
+- bibliotecária empresta livro inexistente
+  cast send <contrato> "emprestar(uint256,address)" 99 0x90F79bf6EB2c4f870365E785982E1f101E93b906  (assinada por: bibliotecaria)
+  saída do cast: Error: Failed to estimate gas: server returned an error response: error code 3: execution reverted: custom error 0xbfd61f9f: c, data: "0xbfd61f9f0000000000000000000000000000000000000000000000000000000000000063": LivroInexistente(99)
+  [ok] bibliotecária empresta livro inexistente -> revert LivroInexistente
+  [ok] nenhuma transação chegou à cadeia (bloco 10 -> 10)
+
+Com --gas-limit fixo, o cast pula a estimativa. A transação é minerada, reverte e paga o gas.
+- intruso força a devolução do empréstimo de Ana
+  cast send <contrato> "devolver(uint256,address)" 2 <ana> --gas-limit 100000  (assinada por: intruso)
+  tx 0x06f3063725a7b24bb17c19357305301d9d552b55a6417358c5953b0beb9ed40f
+  bloco 11 | gas 24167 | status 0x0 | eventos emitidos 0
+  cast run (reexecução da transação): SomenteBibliotecario(0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65)
+  [ok] transação forçada foi minerada com status 0x0
+  [ok] o revert ainda custou 24167 de gas ao intruso
+  [ok] erro na reexecução é SomenteBibliotecario
+  [ok] empréstimo de Ana continua ativo
+  [ok] nenhum LivroDevolvido novo (2 -> 2)

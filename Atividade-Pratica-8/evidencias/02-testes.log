@@ -1,0 +1,127 @@
+# Testes automatizados e relatório de gas
+
+> forge test --gas-report
+No files changed, compilation skipped
+
+Ran 25 tests for test/Biblioteca.t.sol:BibliotecaTest
+[PASS] testFuzz_atrasoArredondaParaCimaEmDias(uint32) (runs: 1000, μ: 112631, ~: 112653)
+[PASS] testFuzz_emprestarEDevolverConservaExemplares(uint32,uint8) (runs: 1000, μ: 800137, ~: 446772)
+[PASS] test_cadastrarLivroGuardaEstadoEEmiteEvento() (gas: 108206)
+[PASS] test_construtorTornaImplantadorDonoEBibliotecario() (gas: 35202)
+[PASS] test_consultarEmprestimoMostraAtrasoSemTransacao() (gas: 97105)
+[PASS] test_devolverComAtrasoInformaDiasNoEvento() (gas: 130680)
+[PASS] test_devolverNoPrazoLiberaExemplarSemAtraso() (gas: 159514)
+[PASS] test_emprestarReservaExemplarEEmiteEvento() (gas: 129832)
+[PASS] test_leitorRenovaOProprioEmprestimoUmaVez() (gas: 150073)
+[PASS] test_revertAoPassarDoLimiteDeEmprestimos() (gas: 560781)
+[PASS] test_revertComTituloVazioOuLongoDemais() (gas: 71362)
+[PASS] test_revertComZeroExemplares() (gas: 35311)
+[PASS] test_revertDevolucaoDupla() (gas: 155679)
+[PASS] test_revertEmprestimoDuplicadoDoMesmoTitulo() (gas: 123208)
+[PASS] test_revertQuandoBibliotecarioRevogadoTentaEmprestar() (gas: 66184)
+[PASS] test_revertQuandoIntrusoCadastraLivro() (gas: 35666)
+[PASS] test_revertQuandoIntrusoRegistraDevolucaoFalsa() (gas: 122419)
+[PASS] test_revertQuandoLivroNaoExiste() (gas: 45625)
+[PASS] test_revertQuandoNaoDonoTentaSePromover() (gas: 40687)
+[PASS] test_revertQuandoTerceiroAceitaDono() (gas: 84709)
+[PASS] test_revertRenovacaoDeEmprestimoAtrasado() (gas: 118555)
+[PASS] test_revertRenovacaoPorQuemNaoPegouOLivro() (gas: 119930)
+[PASS] test_revertSegundaRenovacao() (gas: 148589)
+[PASS] test_revertSemExemplarDisponivelNaoAlteraEstado() (gas: 220106)
+[PASS] test_transferenciaDeDonoExigeAceite() (gas: 153556)
+Suite result: ok. 25 passed; 0 failed; 0 skipped; finished in 977.32ms (2.08s CPU time)
+
+Ran 1 test for test/BibliotecaInvariante.t.sol:BibliotecaInvarianteTest
+[PASS]
+BibliotecaInvarianteTest invariants:
+[PASS] invariant_disponiveisNuncaPassamDosExemplares
+[PASS] invariant_exemplaresForaBatemComEmprestimosAtivos
+ BibliotecaInvarianteTest invariants (runs: 256, calls: 12800, reverts: 0)
+
+╭----------------------+--------------+-------+---------+----------╮
+| Contract             | Selector     | Calls | Reverts | Discards |
++==================================================================+
+| OperadorDaBiblioteca | avancarTempo | 2528  | 0       | 0        |
+|----------------------+--------------+-------+---------+----------|
+| OperadorDaBiblioteca | cadastrar    | 2548  | 0       | 0        |
+|----------------------+--------------+-------+---------+----------|
+| OperadorDaBiblioteca | devolver     | 2595  | 0       | 0        |
+|----------------------+--------------+-------+---------+----------|
+| OperadorDaBiblioteca | emprestar    | 2554  | 0       | 0        |
+|----------------------+--------------+-------+---------+----------|
+| OperadorDaBiblioteca | renovar      | 2575  | 0       | 0        |
+╰----------------------+--------------+-------+---------+----------╯
+
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 50.55s (50.54s CPU time)
+
+╭----------------------------------------+-----------------+-------+--------+-------+---------╮
+| src/Biblioteca.sol:Biblioteca Contract |                 |       |        |       |         |
++=============================================================================================+
+| Deployment Cost                        | Deployment Size |       |        |       |         |
+|----------------------------------------+-----------------+-------+--------+-------+---------|
+|                                1091005 |            4737 |       |        |       |         |
+|----------------------------------------+-----------------+-------+--------+-------+---------|
+|                                        |                 |       |        |       |         |
+|----------------------------------------+-----------------+-------+--------+-------+---------|
+| Function Name                          | Min             | Avg   | Median | Max   | # Calls |
+|----------------------------------------+-----------------+-------+--------+-------+---------|
+| aceitarDono                            |           23430 | 28255 |  28255 | 33081 |       2 |
+|----------------------------------------+-----------------+-------+--------+-------+---------|
+| bibliotecario                          |            2618 |  2618 |   2618 |  2618 |       4 |
+|----------------------------------------+-----------------+-------+--------+-------+---------|
+| cadastrarLivro                         |           24310 | 79594 |  77056 | 94240 |    1817 |
+|----------------------------------------+-----------------+-------+--------+-------+---------|
+| consultarEmprestimo                    |            2954 |  2997 |   2954 |  3447 |    7493 |
+|----------------------------------------+-----------------+-------+--------+-------+---------|
+| consultarLivro                         |            2578 |  5680 |   5682 |  5682 |    2806 |
+|----------------------------------------+-----------------+-------+--------+-------+---------|
+| definirBibliotecario                   |           24194 | 45620 |  47841 | 47841 |      29 |
+|----------------------------------------+-----------------+-------+--------+-------+---------|
+| devolver                               |           24179 | 42090 |  42083 | 42737 |    1870 |
+|----------------------------------------+-----------------+-------+--------+-------+---------|
+| dono                                   |            2402 |  2402 |   2402 |  2402 |       3 |
+|----------------------------------------+-----------------+-------+--------+-------+---------|
+| donoPendente                           |            2381 |  2381 |   2381 |  2381 |       2 |
+|----------------------------------------+-----------------+-------+--------+-------+---------|
+| emprestar                              |           24246 | 73986 |  77158 | 77386 |    3482 |
+|----------------------------------------+-----------------+-------+--------+-------+---------|
+| emprestimosAtivos                      |            2564 |  2564 |   2564 |  2564 |    1723 |
+|----------------------------------------+-----------------+-------+--------+-------+---------|
+| limitePorLeitor                        |             260 |   260 |    260 |   260 |    1721 |
+|----------------------------------------+-----------------+-------+--------+-------+---------|
+| prazoEmprestimo                        |             238 |   238 |    238 |   238 |       2 |
+|----------------------------------------+-----------------+-------+--------+-------+---------|
+| renovar                                |           23851 | 29345 |  29432 | 29432 |     188 |
+|----------------------------------------+-----------------+-------+--------+-------+---------|
+| tamanhoMaximoTitulo                    |             283 |   283 |    283 |   283 |       1 |
+|----------------------------------------+-----------------+-------+--------+-------+---------|
+| totalLivros                            |            2317 |  2317 |   2317 |  2317 |   10319 |
+|----------------------------------------+-----------------+-------+--------+-------+---------|
+| transferirDono                         |           47639 | 47639 |  47639 | 47639 |       2 |
+╰----------------------------------------+-----------------+-------+--------+-------+---------╯
+
+╭---------------------------------------------------------------+-----------------+-------+--------+--------+---------╮
+| test/BibliotecaInvariante.t.sol:OperadorDaBiblioteca Contract |                 |       |        |        |         |
++=====================================================================================================================+
+| Deployment Cost                                               | Deployment Size |       |        |        |         |
+|---------------------------------------------------------------+-----------------+-------+--------+--------+---------|
+|                                                       1878764 |            7985 |       |        |        |         |
+|---------------------------------------------------------------+-----------------+-------+--------+--------+---------|
+|                                                               |                 |       |        |        |         |
+|---------------------------------------------------------------+-----------------+-------+--------+--------+---------|
+| Function Name                                                 | Min             | Avg   | Median | Max    | # Calls |
+|---------------------------------------------------------------+-----------------+-------+--------+--------+---------|
+| avancarTempo                                                  |            3518 |  3950 |   4201 |   4203 |    2540 |
+|---------------------------------------------------------------+-----------------+-------+--------+--------+---------|
+| cadastrar                                                     |            7691 | 61883 |  95517 | 112769 |    2556 |
+|---------------------------------------------------------------+-----------------+-------+--------+--------+---------|
+| devolver                                                      |            7707 | 28576 |  21243 |  96572 |    2605 |
+|---------------------------------------------------------------+-----------------+-------+--------+--------+---------|
+| emprestar                                                     |            7705 | 96022 | 120774 | 155059 |    2568 |
+|---------------------------------------------------------------+-----------------+-------+--------+--------+---------|
+| renovar                                                       |            7684 | 22672 |  21273 |  58785 |    2582 |
+╰---------------------------------------------------------------+-----------------+-------+--------+--------+---------╯
+
+
+Ran 2 test suites in 50.73s (51.53s CPU time): 26 tests passed, 0 failed, 0 skipped (26 total tests)
+  [ok] todos os testes passam

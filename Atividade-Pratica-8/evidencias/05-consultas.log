@@ -1,0 +1,23 @@
+# Consultas (funções view, via eth_call)
+
+antes das consultas: bloco 10 | nonce do dono 2
+
+> cast call <contrato> "consultarLivro(uint256)(string,uint32,uint32)" 1
+  livro 1 | titulo "Dom Casmurro" | exemplares 2 | disponiveis 2
+> cast call <contrato> "consultarLivro(uint256)(string,uint32,uint32)" 2
+  livro 2 | titulo "Memorias Postumas de Bras Cubas" | exemplares 1 | disponiveis 0
+> cast call <contrato> "consultarEmprestimo(uint256,address)(bool,uint64,bool,uint64)" 1 <ana>
+  livro 1 / ana | ativo false | vence - | renovado false | dias de atraso 0
+> cast call <contrato> "consultarEmprestimo(uint256,address)(bool,uint64,bool,uint64)" 1 <bruno>
+  livro 1 / bruno | ativo false | vence - | renovado false | dias de atraso 0
+> cast call <contrato> "consultarEmprestimo(uint256,address)(bool,uint64,bool,uint64)" 2 <ana>
+  livro 2 / ana | ativo true | vence 2026-11-23 12:01:24 UTC | renovado false | dias de atraso 7
+> totalLivros() = 2 | emprestimosAtivos(ana) = 1 | bibliotecario(bibliotecaria) = true
+
+depois das consultas: bloco 10 | nonce do dono 2
+  [ok] Dom Casmurro voltou a ter 2 de 2 exemplares
+  [ok] Memorias Postumas segue com 0 de 1 exemplar
+  [ok] empréstimo de Memorias Postumas com Ana ativo e atrasado
+  [ok] Ana tem 1 empréstimo ativo
+  [ok] consultas não criaram blocos
+  [ok] consultas não consumiram nonce
