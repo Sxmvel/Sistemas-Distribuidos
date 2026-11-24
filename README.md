@@ -17,6 +17,10 @@ da biblioteca para uma blockchain didática: com várias cópias do mesmo estado
 A **Atividade 9** volta à biblioteca para medir em vez de construir: com três processos, logs
 correlacionados e falhas provocadas, o que o cliente vê, e o que realmente aconteceu do outro lado?
 
+O **Trabalho Prático 1** junta tudo num sistema só, fora da biblioteca: o alarme de uma barragem
+de rejeito, com sensores em MQTT, três controladores replicados e clientes em gRPC. O alarme
+precisa tocar mesmo com um controlador caindo ou mentindo.
+
 ---
 
 ## 🧭 O fio condutor
@@ -58,6 +62,12 @@ réplicas do acervo, logs JSON com `correlation_id` e spans nos três processos,
 de carga e caos. O cliente viu 0% de erro enquanto uma réplica falhava, a média ficou "boa" com um
 p99 de meio segundo, e o gargalo mudou de processo sem a latência do cliente mostrar onde.
 
+**O Trabalho Prático 1** usa o que as atividades separaram: MQTT no campo (AP3), gRPC entre
+clientes e controladores (AP4), identificador de requisição com failover (AP5) e réplicas que
+podem discordar (AP6). A diferença é que agora uma das cópias pode mentir de propósito. A resposta
+vem em camadas: votação por maioria no cliente, quarentena entre controladores e quórum de 2 nos
+atuadores, para que nenhum controlador sozinho consiga silenciar a sirene.
+
 | | AP1 | AP2 | AP3 | AP4 |
 | --- | --- | --- | --- | --- |
 | **Estilo** | protocolo próprio | requisição/resposta | publish/subscribe | chamada de procedimento |
@@ -69,29 +79,31 @@ p99 de meio segundo, e o gargalo mudou de processo sem a latência do cliente mo
 | **Quem conhece quem** | endereço fixo | cliente conhece a URL | ninguém conhece ninguém | cliente conhece método e endereço |
 | **Canal de erro** | nenhum | status HTTP | não existe | status gRPC |
 
-A tabela compara os estilos de comunicação das quatro primeiras atividades. As atividades 5 e 6
-não introduzem um estilo novo. Usam o que veio antes para estudar falhas e acordo entre cópias.
+A tabela compara os estilos de comunicação das quatro primeiras atividades. As atividades 5, 6 e 9
+não introduzem um estilo novo. Usam o que veio antes para estudar falhas, acordo entre cópias e
+medição. O TP1 combina dois estilos no mesmo sistema: publish/subscribe no campo e chamada de
+procedimento entre clientes e controladores.
 
 ---
 
 ## 🛠️ Tecnologias utilizadas
 
-| Camada | AP1 | AP2 | AP3 | AP4 | AP5 | AP6 | AP9 |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Comunicação | `socket` (TCP/IP) | FastAPI / HTTP | `paho-mqtt` (MQTT 5) | `grpcio` / HTTP/2 | FastAPI + `requests` e proxy TCP de falhas | réplicas em memória, sem rede | FastAPI + `httpx` (gateway) e proxy TCP de falhas |
-| Serialização | CSV, JSON, XML, YAML, TOML | JSON + Pydantic | JSON (envelope próprio) | Protocol Buffers | JSON + Pydantic | JSON canônico + SHA-256 | JSON; logs em JSON Lines |
-| Persistência | — | SQLite (`sqlite3` puro) | SQLite (deduplicação) | memória com trava | SQLite (`sqlite3` puro) | memória (cadeias imutáveis) | catálogo sintético em memória |
-| Infraestrutura | — | — | Mosquitto 2 em Docker | — | servidores em subprocesso | Maven multimódulo | 3 serviços em subprocesso, `psutil` |
-| Testes | manual | `pytest` (45) | `pytest` (61) | `pytest` (58) | `pytest` (81) | 54 verificações nos experimentos | `pytest` (65) e 60 verificações nos experimentos |
+| Camada | AP1 | AP2 | AP3 | AP4 | AP5 | AP6 | AP9 | TP1 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Comunicação | `socket` (TCP/IP) | FastAPI / HTTP | `paho-mqtt` (MQTT 5) | `grpcio` / HTTP/2 | FastAPI + `requests` e proxy TCP de falhas | réplicas em memória, sem rede | FastAPI + `httpx` (gateway) e proxy TCP de falhas | gRPC 1.68 (clientes e replicação) e MQTT com Paho |
+| Serialização | CSV, JSON, XML, YAML, TOML | JSON + Pydantic | JSON (envelope próprio) | Protocol Buffers | JSON + Pydantic | JSON canônico + SHA-256 | JSON; logs em JSON Lines | Protocol Buffers e JSON (Jackson) assinado com HMAC-SHA256 |
+| Persistência | — | SQLite (`sqlite3` puro) | SQLite (deduplicação) | memória com trava | SQLite (`sqlite3` puro) | memória (cadeias imutáveis) | catálogo sintético em memória | H2 em arquivo, um banco por controlador |
+| Infraestrutura | — | — | Mosquitto 2 em Docker | — | servidores em subprocesso | Maven multimódulo | 3 serviços em subprocesso, `psutil` | Spring Boot 3.5, Maven multimódulo, broker Moquette embutido, scripts PowerShell |
+| Testes | manual | `pytest` (45) | `pytest` (61) | `pytest` (58) | `pytest` (81) | 54 verificações nos experimentos | `pytest` (65) e 60 verificações nos experimentos | roteiro de demonstração pelo painel |
 
-**Linguagem:** Python nas atividades 1 a 5 e 9, e Java 21 na Atividade 6.
+**Linguagem:** Python nas atividades 1 a 5 e 9, e Java 21 na Atividade 6 e no TP1.
 
 ---
 
 ## 🗂️ Organização do repositório
 
 Cada atividade tem a sua própria pasta e o seu próprio branch, com dependências independentes:
-ambiente virtual Python nas atividades 1 a 5 e 9, e projeto Maven na 6. Nada é compartilhado entre
+ambiente virtual Python nas atividades 1 a 5 e 9, e projeto Maven na 6 e no TP1. Nada é compartilhado entre
 elas além do domínio modelado. A AP5 parte de uma cópia da API da AP2, e a AP2 original não é
 alterada.
 
@@ -103,11 +115,13 @@ Atividade-Pratica-4/   serviço remoto com gRPC e Protocol Buffers
 Atividade-Pratica-5/   falhas controladas, retry, circuit breaker e segurança sobre a API da AP2
 Atividade-Pratica-6/   blockchain didática em Java: integridade, réplicas e consenso
 Atividade-Pratica-9/   testes, observabilidade e medição: carga, correlação, traces e caos
+Trabalho-Pratico-1/    alarme de barragem: sensores MQTT, controladores replicados e clientes gRPC
 ```
 
 Cada pasta traz o roteiro de execução no seu README e, quando existe, em `docs/`. As atividades
-2 a 5 têm suítes de teste com `pytest`. A 6 se verifica pelos próprios experimentos, que geram
-evidências reproduzíveis em `evidencias/`.
+2 a 5 e a 9 têm suítes de teste com `pytest`. A 6 se verifica pelos próprios experimentos, que
+geram evidências reproduzíveis em `evidencias/`, e a 9 também tem uma bateria de experimentos. O
+TP1 se demonstra por um roteiro no painel web.
 
 ---
 
@@ -413,6 +427,38 @@ garantia de entrega que ele oferece.
 
 ---
 
+### 📍 [Trabalho Prático 1](Trabalho-Pratico-1/README.md)
+
+#### Middleware de alarme para barragem de rejeito
+
+> Monitoramento de uma barragem fictícia até a ruptura. Oito sensores publicam leituras
+> assinadas em MQTT, três controladores replicados calculam o nível de risco (NORMAL → ATENÇÃO →
+> N1 → N2 → N3) e acionam sirenes, rota de fuga, cancela e bomba, e dois clientes (painel web e
+> terminal da Defesa Civil) acessam o sistema por gRPC. O tema vem de Brumadinho, onde as sirenes
+> não tocaram: o requisito central é o alarme disparar mesmo com controladores caindo ou mentindo.
+
+* **Conceitos estudados:** replicação ativa e primário-backup; eleição de líder por heartbeat;
+  idempotência com identificador de requisição; votação por maioria e mediana; falha bizantina e
+  quarentena; quórum; integridade de mensagens com HMAC; rejeição de replay e checagem de
+  plausibilidade.
+* **Arquitetura em camadas:** camadas do sistema em pastas (`campo/`, `middleware/`, `clientes/`,
+  `compartilhado/`) e, dentro de cada módulo, `dominio/`, `aplicacao/`, `infraestrutura/`,
+  `entrada/` e `config/`.
+* **Réplicas dos dados:** cada controlador tem o próprio H2. As leituras são processadas pelos três
+  de forma determinística, os comandos são sequenciados pelo líder e confirmados só com a maioria
+  gravada, e quem volta ao ar sincroniza o que perdeu com os pares.
+* **Controlador que cai:** o cliente reenvia o mesmo `requisicao_id` para outra réplica, que já
+  conhece a operação e devolve o resultado original sem executar de novo.
+* **Controlador que mente:** votação no cliente, quarentena entre réplicas, comandos assinados com
+  quórum de 2 nos atuadores e leituras de sensor com HMAC e checagem física.
+* **Roteiro de demonstração pelo painel:** ruptura até N3, controlador malicioso em quarentena com a
+  sirene continuando a tocar, queda do líder no meio de um comando (sucesso deduplicado),
+  recuperação com sincronização e ataques ao campo descartados.
+* **Limites declarados:** tolera 1 controlador falho ou malicioso por vez, não trata partição de
+  rede e usa chaves HMAC fixas no código, por ser didático.
+
+---
+
 ## 🔍 Síntese comparativa
 
 O mesmo problema, resolvido em três estilos, deixa as diferenças em evidência.
@@ -424,6 +470,7 @@ O mesmo problema, resolvido em três estilos, deixa as diferenças em evidência
 | AP2 — REST | `PUT` idempotente por definição; `If-Match` com `ETag` | **protocolo** |
 | AP3 — MQTT | `message_id` no envelope, deduplicado por cada consumidor | **mensagem** |
 | AP4 — gRPC | campo `chave_idempotencia` guardado com a impressão do pedido | **aplicação** |
+| TP1 — controladores | `requisicao_id` replicado para a maioria antes da resposta | **replicação** |
 
 gRPC é o que menos ajuda: não existe "método idempotente" no protocolo, todo RPC é uma chamada
 opaca. A ambiguidade do `DEADLINE_EXCEEDED` é a mesma de um `POST` que deu timeout — mas o HTTP
@@ -454,13 +501,15 @@ entre serviços** internos, e **MQTT para propagar** o que aconteceu.
 
 ### Da chamada que falha ao acordo entre cópias
 
-As três últimas atividades seguem a mesma incerteza em escalas crescentes:
+A partir da AP4, as atividades seguem a mesma incerteza em escalas crescentes:
 
 | Atividade | Escala | A incerteza | O que a atividade mostrou |
 | --- | --- | --- | --- |
 | AP4 | uma chamada | o cliente recebe `DEADLINE_EXCEEDED` e o servidor concluiu com `OK` | com chave de idempotência, repetir a chamada não duplica |
 | AP5 | várias tentativas e clientes | quatro causas diferentes produzem o mesmo timeout | o retry só ajuda com backoff, jitter e idempotência; sem eles, multiplica efeito e carga |
 | AP6 | várias cópias | duas cópias válidas discordam | nenhuma verificação local decide; é preciso consenso entre os nós |
+| AP9 | vários processos observados | o cliente vê sucesso e uma réplica está falhando | sem correlação entre os logs, o failover apaga a evidência |
+| TP1 | três réplicas, uma podendo mentir | um controlador responde valores que não conferem | maioria no cliente, quarentena entre réplicas e quórum nos atuadores toleram uma réplica bizantina |
 
 Cada passo mostra que a ferramenta local (o status, o retry, o hash) não basta, e que a
 garantia precisa ser construída no protocolo entre as partes.
