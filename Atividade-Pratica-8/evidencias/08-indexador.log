@@ -1,0 +1,18 @@
+# Indexador off-chain reconstruindo o estado pelos eventos
+
+O indexador só lê logs (eth_getLogs). Ele não chama nenhuma função do contrato para montar o estado.
+
+bloco  3 | LivroCadastrado    | livro 1 "Dom Casmurro" com 2 exemplar(es)
+bloco  4 | LivroCadastrado    | livro 2 "Memorias Postumas de Bras Cubas" com 1 exemplar(es)
+bloco  5 | LivroEmprestado    | livro 1 / ana   | vence 2026-11-23 12:01:00 UTC
+bloco  6 | LivroEmprestado    | livro 1 / bruno | vence 2026-11-23 12:01:12 UTC
+bloco  7 | LivroEmprestado    | livro 2 / ana   | vence 2026-11-23 12:01:24 UTC
+bloco  8 | EmprestimoRenovado | livro 1 / ana   | novo vencimento 2026-12-07 12:01:00 UTC
+bloco  9 | LivroDevolvido     | livro 1 / bruno | 7 dia(s) de atraso
+bloco 10 | LivroDevolvido     | livro 1 / ana   | 0 dia(s) de atraso
+
+Empréstimos ativos segundo o indexador, conferidos com a função view:
+  livro 2 "Memorias Postumas de Bras Cubas" com ana, vence 2026-11-23 12:01:24 UTC -> confere (view: ativo true, atraso 7 dia(s))
+  [ok] indexador encontrou exatamente 1 empréstimo ativo
+  [ok] estado reconstruído pelos eventos confere com o estado on-chain
+  [ok] catálogo reconstruído tem os 2 títulos

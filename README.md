@@ -14,12 +14,17 @@ controladas para medir o que acontece quando a comunicação dá errado, e a **A
 da biblioteca para uma blockchain didática: com várias cópias do mesmo estado, como saber qual
 é a certa?
 
+<<<<<<< HEAD
+A **Atividade 8** volta à biblioteca, agora como contrato inteligente: as regras de empréstimo
+rodam em todo nó da rede, e ninguém precisa confiar num servidor central.
+=======
 A **Atividade 9** volta à biblioteca para medir em vez de construir: com três processos, logs
 correlacionados e falhas provocadas, o que o cliente vê, e o que realmente aconteceu do outro lado?
 
 O **Trabalho Prático 1** junta tudo num sistema só, fora da biblioteca: o alarme de uma barragem
 de rejeito, com sensores em MQTT, três controladores replicados e clientes em gRPC. O alarme
 precisa tocar mesmo com um controlador caindo ou mentindo.
+>>>>>>> origin
 
 ---
 
@@ -57,6 +62,13 @@ encadeado detecta qualquer adulteração. Mesmo assim, um atacante que reescreve
 a torna válida de novo, e duas réplicas separadas por uma partição podem ser válidas e discordar.
 Integridade não é consenso.
 
+<<<<<<< HEAD
+**A Atividade 8** usa uma cadeia que já tem consenso e coloca regra dentro dela. Os empréstimos da
+biblioteca viram um contrato em Solidity, que todo nó executa igual. Quem pode alterar o quê
+passa a ser decidido pela assinatura da transação, e uma regra violada reverte sem gravar nada.
+O preço é que cada escrita paga gas, nada se apaga, e a cadeia continua sem saber se o livro
+físico voltou para a estante.
+=======
 **A Atividade 9** pergunta como se sabe o que aconteceu. Um gateway com failover na frente de duas
 réplicas do acervo, logs JSON com `correlation_id` e spans nos três processos, e sete experimentos
 de carga e caos. O cliente viu 0% de erro enquanto uma réplica falhava, a média ficou "boa" com um
@@ -67,6 +79,7 @@ clientes e controladores (AP4), identificador de requisição com failover (AP5)
 podem discordar (AP6). A diferença é que agora uma das cópias pode mentir de propósito. A resposta
 vem em camadas: votação por maioria no cliente, quarentena entre controladores e quórum de 2 nos
 atuadores, para que nenhum controlador sozinho consiga silenciar a sirene.
+>>>>>>> origin
 
 | | AP1 | AP2 | AP3 | AP4 |
 | --- | --- | --- | --- | --- |
@@ -79,15 +92,33 @@ atuadores, para que nenhum controlador sozinho consiga silenciar a sirene.
 | **Quem conhece quem** | endereço fixo | cliente conhece a URL | ninguém conhece ninguém | cliente conhece método e endereço |
 | **Canal de erro** | nenhum | status HTTP | não existe | status gRPC |
 
+<<<<<<< HEAD
+A tabela compara os estilos de comunicação das quatro primeiras atividades. As atividades 5, 6
+e 8 não introduzem um estilo novo. Usam o que veio antes para estudar falhas, acordo entre
+cópias e regras executadas por todos os nós.
+=======
 A tabela compara os estilos de comunicação das quatro primeiras atividades. As atividades 5, 6 e 9
 não introduzem um estilo novo. Usam o que veio antes para estudar falhas, acordo entre cópias e
 medição. O TP1 combina dois estilos no mesmo sistema: publish/subscribe no campo e chamada de
 procedimento entre clientes e controladores.
+>>>>>>> origin
 
 ---
 
 ## 🛠️ Tecnologias utilizadas
 
+<<<<<<< HEAD
+| Camada | AP1 | AP2 | AP3 | AP4 | AP5 | AP6 | AP8 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Comunicação | `socket` (TCP/IP) | FastAPI / HTTP | `paho-mqtt` (MQTT 5) | `grpcio` / HTTP/2 | FastAPI + `requests` e proxy TCP de falhas | réplicas em memória, sem rede | JSON-RPC com o nó (`cast`) |
+| Serialização | CSV, JSON, XML, YAML, TOML | JSON + Pydantic | JSON (envelope próprio) | Protocol Buffers | JSON + Pydantic | JSON canônico + SHA-256 | ABI da EVM (chamadas, erros e logs) |
+| Persistência | — | SQLite (`sqlite3` puro) | SQLite (deduplicação) | memória com trava | SQLite (`sqlite3` puro) | memória (cadeias imutáveis) | estado do contrato na EVM |
+| Infraestrutura | — | — | Mosquitto 2 em Docker | — | servidores em subprocesso | Maven multimódulo | Foundry 1.9 e nó local Anvil |
+| Testes | manual | `pytest` (45) | `pytest` (61) | `pytest` (58) | `pytest` (81) | 54 verificações nos experimentos | `forge test` (25 + 2 invariantes) e 40 verificações no nó |
+
+**Linguagem:** Python nas atividades 1 a 5, Java 21 na Atividade 6 e Solidity 0.8.28 na
+Atividade 8.
+=======
 | Camada | AP1 | AP2 | AP3 | AP4 | AP5 | AP6 | AP9 | TP1 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Comunicação | `socket` (TCP/IP) | FastAPI / HTTP | `paho-mqtt` (MQTT 5) | `grpcio` / HTTP/2 | FastAPI + `requests` e proxy TCP de falhas | réplicas em memória, sem rede | FastAPI + `httpx` (gateway) e proxy TCP de falhas | gRPC 1.68 (clientes e replicação) e MQTT com Paho |
@@ -97,13 +128,18 @@ procedimento entre clientes e controladores.
 | Testes | manual | `pytest` (45) | `pytest` (61) | `pytest` (58) | `pytest` (81) | 54 verificações nos experimentos | `pytest` (65) e 60 verificações nos experimentos | roteiro de demonstração pelo painel |
 
 **Linguagem:** Python nas atividades 1 a 5 e 9, e Java 21 na Atividade 6 e no TP1.
+>>>>>>> origin
 
 ---
 
 ## 🗂️ Organização do repositório
 
 Cada atividade tem a sua própria pasta e o seu próprio branch, com dependências independentes:
+<<<<<<< HEAD
+ambiente virtual Python nas atividades 1 a 5, projeto Maven na 6 e projeto Foundry na 8. Nada é compartilhado entre
+=======
 ambiente virtual Python nas atividades 1 a 5 e 9, e projeto Maven na 6 e no TP1. Nada é compartilhado entre
+>>>>>>> origin
 elas além do domínio modelado. A AP5 parte de uma cópia da API da AP2, e a AP2 original não é
 alterada.
 
@@ -114,6 +150,15 @@ Atividade-Pratica-3/   publish/subscribe com MQTT e Mosquitto
 Atividade-Pratica-4/   serviço remoto com gRPC e Protocol Buffers
 Atividade-Pratica-5/   falhas controladas, retry, circuit breaker e segurança sobre a API da AP2
 Atividade-Pratica-6/   blockchain didática em Java: integridade, réplicas e consenso
+<<<<<<< HEAD
+Atividade-Pratica-8/   contrato inteligente de empréstimos em Solidity, testado e implantado no Anvil
+```
+
+Cada pasta traz o roteiro de execução no seu README e, quando existe, em `docs/`. As atividades
+2 a 5 têm suítes de teste com `pytest`. A 6 se verifica pelos próprios experimentos, que geram
+evidências reproduzíveis em `evidencias/`. A 8 tem testes em `forge test` e um laboratório em
+PowerShell que implanta o contrato num nó local e grava as evidências, também reproduzíveis.
+=======
 Atividade-Pratica-9/   testes, observabilidade e medição: carga, correlação, traces e caos
 Trabalho-Pratico-1/    alarme de barragem: sensores MQTT, controladores replicados e clientes gRPC
 ```
@@ -122,6 +167,7 @@ Cada pasta traz o roteiro de execução no seu README e, quando existe, em `docs
 2 a 5 e a 9 têm suítes de teste com `pytest`. A 6 se verifica pelos próprios experimentos, que
 geram evidências reproduzíveis em `evidencias/`, e a 9 também tem uma bateria de experimentos. O
 TP1 se demonstra por um roteiro no painel web.
+>>>>>>> origin
 
 ---
 
@@ -389,6 +435,41 @@ garantia de entrega que ele oferece.
 
 ---
 
+<<<<<<< HEAD
+### 📍 [Atividade Prática 8](Atividade-Pratica-8/README.md)
+
+#### Contrato inteligente de empréstimos de biblioteca
+
+> O acervo e os empréstimos das atividades 2 a 5 viram um contrato em **Solidity 0.8.28**,
+> testado com **Foundry** e implantado num nó local **Anvil**. Um script PowerShell executa o
+> roteiro inteiro do enunciado (implantar, transacionar, consultar, observar eventos e forçar
+> revert) e grava as evidências.
+
+* **Conceitos estudados:** contrato como estado replicado sob regras determinísticas; transação
+  contra chamada `view`; gas como custo e como proteção; eventos e integração off-chain;
+  controle de acesso; oráculo e fronteira on-chain/off-chain.
+* **O contrato:** 7 funções que alteram estado, 2 consultas `view`, 7 eventos e 13 erros
+  customizados. Há papéis de dono e bibliotecário, transferência de posse em duas etapas, limite
+  de 3 livros por leitor, renovação feita pelo próprio leitor e atraso calculado on-chain.
+* **Testes:** 8 de sucesso, 15 de revert, 2 de fuzz e 2 invariantes, com 12.800 chamadas
+  aleatórias. Cinco defeitos injetados de propósito foram todos detectados.
+* **Laboratório reproduzível:** gênese e intervalo de blocos fixos fazem endereço, hashes e gas
+  se repetirem byte a byte. São 40 verificações, e um indexador reconstrói o estado só pelos
+  eventos e confere com a `view`.
+* **Análise** em `.docx`: as 5 questões do enunciado, 7 riscos de segurança e a comparação com
+  a API REST da AP2.
+* **Principais aprendizados:**
+  * **Ler é de graça, escrever é replicado.** Consultas `view` não criaram bloco nem gastaram
+    nonce. Cada escrita custou de 29 a 94 mil de gas, e uma transação revertida ainda cobrou
+    24.167.
+  * **O controle de acesso é o próprio estado.** Sem `somenteBibliotecario`, o leitor
+    registraria a própria devolução e ficaria com o livro, e não há administrador que desfaça
+    uma transação confirmada.
+  * **Consenso não torna o fato verdadeiro.** A cadeia registra fielmente o que a bibliotecária
+    afirmou. Para uma biblioteca só, a API REST da AP2 continua sendo a escolha certa. O
+    contrato se justifica quando várias instituições que não confiam entre si compartilham o
+    mesmo acervo.
+=======
 ### 📍 [Atividade Prática 9](Atividade-Pratica-9/README.md)
 
 #### Testes, observabilidade e medição
@@ -456,6 +537,7 @@ garantia de entrega que ele oferece.
   recuperação com sincronização e ataques ao campo descartados.
 * **Limites declarados:** tolera 1 controlador falho ou malicioso por vez, não trata partição de
   rede e usa chaves HMAC fixas no código, por ser didático.
+>>>>>>> origin
 
 ---
 
@@ -470,7 +552,11 @@ O mesmo problema, resolvido em três estilos, deixa as diferenças em evidência
 | AP2 — REST | `PUT` idempotente por definição; `If-Match` com `ETag` | **protocolo** |
 | AP3 — MQTT | `message_id` no envelope, deduplicado por cada consumidor | **mensagem** |
 | AP4 — gRPC | campo `chave_idempotencia` guardado com a impressão do pedido | **aplicação** |
+<<<<<<< HEAD
+| AP8 — contrato | nonce da conta (a mesma transação não executa duas vezes) + `EmprestimoDuplicado` | **consenso** |
+=======
 | TP1 — controladores | `requisicao_id` replicado para a maioria antes da resposta | **replicação** |
+>>>>>>> origin
 
 gRPC é o que menos ajuda: não existe "método idempotente" no protocolo, todo RPC é uma chamada
 opaca. A ambiguidade do `DEADLINE_EXCEEDED` é a mesma de um `POST` que deu timeout — mas o HTTP
@@ -501,15 +587,23 @@ entre serviços** internos, e **MQTT para propagar** o que aconteceu.
 
 ### Da chamada que falha ao acordo entre cópias
 
+<<<<<<< HEAD
+As últimas atividades seguem a mesma incerteza em escalas crescentes:
+=======
 A partir da AP4, as atividades seguem a mesma incerteza em escalas crescentes:
+>>>>>>> origin
 
 | Atividade | Escala | A incerteza | O que a atividade mostrou |
 | --- | --- | --- | --- |
 | AP4 | uma chamada | o cliente recebe `DEADLINE_EXCEEDED` e o servidor concluiu com `OK` | com chave de idempotência, repetir a chamada não duplica |
 | AP5 | várias tentativas e clientes | quatro causas diferentes produzem o mesmo timeout | o retry só ajuda com backoff, jitter e idempotência; sem eles, multiplica efeito e carga |
 | AP6 | várias cópias | duas cópias válidas discordam | nenhuma verificação local decide; é preciso consenso entre os nós |
+<<<<<<< HEAD
+| AP8 | várias partes | quem pode mudar o estado compartilhado, e se o que foi registrado aconteceu | a regra no contrato resolve a primeira pergunta para todos os nós; a segunda continua dependendo de quem traz o fato de fora |
+=======
 | AP9 | vários processos observados | o cliente vê sucesso e uma réplica está falhando | sem correlação entre os logs, o failover apaga a evidência |
 | TP1 | três réplicas, uma podendo mentir | um controlador responde valores que não conferem | maioria no cliente, quarentena entre réplicas e quórum nos atuadores toleram uma réplica bizantina |
+>>>>>>> origin
 
 Cada passo mostra que a ferramenta local (o status, o retry, o hash) não basta, e que a
 garantia precisa ser construída no protocolo entre as partes.

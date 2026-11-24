@@ -1,0 +1,50 @@
+# Transações que alteram estado
+
+[01] dono autoriza a bibliotecária
+     cast send <contrato> "definirBibliotecario(address,bool)" 0x70997970C51812dc3A010C7d01b50e0d17dc79C8 true  (assinada por: dono)
+     tx 0x3f08bc30879090eb8f2900e0c34dac3cfce711ea5e57c1a2a469353dec5dc77a
+     bloco 2 | gas 47841 | status sucesso | eventos emitidos 1
+
+[02] bibliotecária cadastra Dom Casmurro (2 exemplares)
+     cast send <contrato> "cadastrarLivro(string,uint32)" Dom Casmurro 2  (assinada por: bibliotecaria)
+     tx 0x3967abb37fbebd4f851575af0c3f618297d5bb54864167dbd57f843b1a18aa5e
+     bloco 3 | gas 94240 | status sucesso | eventos emitidos 1
+
+[03] bibliotecária cadastra Memorias Postumas (1 exemplar)
+     cast send <contrato> "cadastrarLivro(string,uint32)" Memorias Postumas de Bras Cubas 1  (assinada por: bibliotecaria)
+     tx 0xe12b8de4c865e2b991764c5c8df815e71dd3ce0f5da6454561ef3b3996b49488
+     bloco 4 | gas 77368 | status sucesso | eventos emitidos 1
+
+[04] empresta Dom Casmurro para Ana
+     cast send <contrato> "emprestar(uint256,address)" 1 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC  (assinada por: bibliotecaria)
+     tx 0x5f3dfad735b4a06f9c26e3a874555c0a30acfe2ae635a55d076b961c2f1a0fed
+     bloco 5 | gas 77374 | status sucesso | eventos emitidos 1
+
+[05] empresta Dom Casmurro para Bruno
+     cast send <contrato> "emprestar(uint256,address)" 1 0x90F79bf6EB2c4f870365E785982E1f101E93b906  (assinada por: bibliotecaria)
+     tx 0x6e541c3cfcf7cf1469dc2a96e1f9848a4797b8015c2a6f16933d628615928eec
+     bloco 6 | gas 77386 | status sucesso | eventos emitidos 1
+
+[06] empresta Memorias Postumas para Ana
+     cast send <contrato> "emprestar(uint256,address)" 2 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC  (assinada por: bibliotecaria)
+     tx 0x34828d8e5e632ac3e7a5c68c3f46db6329ee847cf4e54003535b72caecae1533
+     bloco 7 | gas 60274 | status sucesso | eventos emitidos 1
+
+[07] Ana renova o próprio empréstimo de Dom Casmurro
+     cast send <contrato> "renovar(uint256)" 1  (assinada por: ana)
+     tx 0xaa40484460fd13f883c61fd475fcdb8448921f24c2ad3efd59af00881fcda0ed
+     bloco 8 | gas 29432 | status sucesso | eventos emitidos 1
+
+>> cast rpc evm_setNextBlockTimestamp 1795953696   (20 dias se passam no nó local: 2026-11-09 12:01:36 UTC -> 2026-11-29 12:01:36 UTC)
+
+[08] Bruno devolve Dom Casmurro com atraso
+     cast send <contrato> "devolver(uint256,address)" 1 0x90F79bf6EB2c4f870365E785982E1f101E93b906  (assinada por: bibliotecaria)
+     tx 0x9f1949eec2ced0bd73781dc468512d6a899a60ef6c3e3f672568b9fe9a946f56
+     bloco 9 | gas 34190 | status sucesso | eventos emitidos 1
+
+[09] Ana devolve Dom Casmurro dentro do prazo renovado
+     cast send <contrato> "devolver(uint256,address)" 1 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC  (assinada por: bibliotecaria)
+     tx 0x1989b694b946e81a724030385e7c918ce4483beb1b06d174050115623f104258
+     bloco 10 | gas 37499 | status sucesso | eventos emitidos 1
+
+  [ok] todas as transações confirmadas

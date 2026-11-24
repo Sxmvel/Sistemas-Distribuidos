@@ -1,0 +1,14 @@
+# Implantação no nó local (Anvil)
+
+nó: Anvil 1.9.0 em http://127.0.0.1:8545 | chain id 31337 | gênese 2026-11-09 12:00:00 UTC | +12 s por bloco
+> forge create src/Biblioteca.sol:Biblioteca --rpc-url http://127.0.0.1:8545 --private-key <chave do dono> --broadcast
+Deployer: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Deployed to: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+Transaction hash: 0x232206da9c822baffd91aebff7d2cb53f3db9c8af7df182bb082c6f3c7936df9
+
+> cast receipt 0x232206da9c822baffd91aebff7d2cb53f3db9c8af7df182bb082c6f3c7936df9
+  bloco 1 | gas 1091005 | status 0x1 | contractAddress 0x5fbdb2315678afecb367f032d93f642f64180aa3
+> cast code 0x5FbDB2315678afecb367f032d93F642f64180aa3  -> 4571 bytes de bytecode implantado
+  [ok] implantação confirmada (status 0x1)
+  [ok] há bytecode no endereço do contrato
+  [ok] o dono é a conta que implantou
