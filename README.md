@@ -1,19 +1,13 @@
-# Sistemas Distribuídos 🌐
+<div align="center">
 
-Repositório das atividades práticas da disciplina de **Sistemas Distribuídos**, 6º período do
-curso de Sistemas de Informação.
+# 🌐 Sistemas Distribuídos
 
-As atividades não são exercícios isolados. As quatro primeiras percorrem, em ordem, os estilos
-de comunicação que um sistema distribuído pode adotar — de um protocolo próprio sobre sockets
-até chamadas remotas com contrato forte. A partir da Atividade 2, elas modelam **o mesmo
-domínio** (o acervo e os empréstimos de uma biblioteca), de propósito: com o problema fixo, o
-que a comparação revela é o estilo de comunicação, e não a diferença entre os domínios.
+Repositório das atividades práticas da disciplina de **Sistemas Distribuídos**<br>
+6º período do curso de Sistemas de Informação
 
-As duas seguintes mudam a pergunta. A **Atividade 5** submete a API da biblioteca a falhas
-controladas para medir o que acontece quando a comunicação dá errado, e a **Atividade 6** sai
-da biblioteca para uma blockchain didática: com várias cópias do mesmo estado, como saber qual
-é a certa?
+</div>
 
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 A **Atividade 8** volta à biblioteca, agora como contrato inteligente: as regras de empréstimo
 rodam em todo nó da rede, e ninguém precisa confiar num servidor central.
@@ -25,6 +19,33 @@ O **Trabalho Prático 1** junta tudo num sistema só, fora da biblioteca: o alar
 de rejeito, com sensores em MQTT, três controladores replicados e clientes em gRPC. O alarme
 precisa tocar mesmo com um controlador caindo ou mentindo.
 >>>>>>> origin
+=======
+---
+
+## 📚 Sumário
+
+| Entrega | Tema | Foco | Linguagem |
+| --- | --- | --- | --- |
+| [AP1](Atividade-Pratica-1/README.MD) | Serialização em texto e sockets TCP | protocolo próprio | Python |
+| [AP2](Atividade-Pratica-2/README.MD) | API REST do acervo de uma biblioteca | requisição/resposta | Python |
+| [AP3](Atividade-Pratica-3/README.MD) | Publish/subscribe com MQTT e Mosquitto | publish/subscribe | Python |
+| [AP4](Atividade-Pratica-4/README.MD) | Serviço remoto com gRPC e Protocol Buffers | chamada de procedimento | Python |
+| [AP5](Atividade-Pratica-5/README.MD) | Falhas controladas, retry, circuit breaker e segurança | resiliência | Python |
+| [AP6](Atividade-Pratica-6/README.md) | Blockchain didática | integridade e consenso | Java 21 |
+| [AP9](Atividade-Pratica-9/README.md) | Testes, observabilidade e medição | observabilidade | Python |
+| [TP1](Trabalho-Pratico-1/README.md) | Alarme de barragem de rejeito | MQTT + gRPC com réplicas | Java 21 |
+
+---
+
+## 🎯 Visão geral
+
+As atividades não são exercícios isolados.
+
+- **AP1 a AP4** percorrem, em ordem, os estilos de comunicação que um sistema distribuído pode adotar — de um protocolo próprio sobre sockets até chamadas remotas com contrato forte. A partir da AP2, elas modelam **o mesmo domínio** (o acervo e os empréstimos de uma biblioteca), de propósito: com o problema fixo, o que a comparação revela é o estilo de comunicação, e não a diferença entre os domínios.
+- **AP5 e AP6** mudam a pergunta. A AP5 submete a API da biblioteca a falhas controladas para medir o que acontece quando a comunicação dá errado; a AP6 sai da biblioteca para uma blockchain didática: com várias cópias do mesmo estado, como saber qual é a certa?
+- **AP9** volta à biblioteca para medir em vez de construir: com três processos, logs correlacionados e falhas provocadas, o que o cliente vê, e o que realmente aconteceu do outro lado?
+- **TP1** junta tudo num sistema só, fora da biblioteca: o alarme de uma barragem de rejeito, com sensores em MQTT, três controladores replicados e clientes em gRPC. O alarme precisa tocar mesmo com um controlador caindo ou mentindo.
+>>>>>>> Stashed changes
 
 ---
 
@@ -32,11 +53,18 @@ precisa tocar mesmo com um controlador caindo ou mentindo.
 
 Cada atividade resolve um problema que a anterior deixou exposto.
 
-**A Atividade 1** monta um protocolo próprio sobre TCP. Para o servidor saber o que chegou, o
-cliente prefixa o formato (`JSON|{...}`); para as mensagens não se colarem no buffer, o
-servidor devolve um `ACK`. Funciona — e deixa claro quanto trabalho existe em inventar um
-protocolo do zero.
+| | O que acontece |
+| --- | --- |
+| **AP1** | Monta um protocolo próprio sobre TCP. Para o servidor saber o que chegou, o cliente prefixa o formato (`JSON\|{...}`); para as mensagens não se colarem no buffer, o servidor devolve um `ACK`. Funciona — e deixa claro quanto trabalho existe em inventar um protocolo do zero. |
+| **AP2** | Troca o protocolo próprio pelo HTTP e descobre que aqueles problemas já tinham solução padronizada: o prefixo `FORMATO\|` vira `Content-Type`, o `ACK` que evitava a junção de pacotes vira `Content-Length`, e os códigos de status substituem convenções inventadas caso a caso. |
+| **AP3** | Ataca outro limite: em REST, o cliente precisa saber quem chamar e esperar a resposta. Com MQTT e um broker no meio, o terminal publica um empréstimo sem saber que existem um painel de acervo e um serviço de atrasos ouvindo. O preço é que não existe resposta — e garantias como "pelo menos uma vez" trazem duplicação junto. |
+| **AP4** | Volta ao modelo síncrono, mas com contrato executável: o `.proto` gera o código dos dois lados, o deadline viaja no protocolo e o status de erro é padronizado. O preço agora é acoplamento de esquema — cliente e servidor compartilham um artefato gerado. |
+| **AP5** | Leva a sério o terceiro resultado que a AP4 mediu ("não se sabe"). A API REST da AP2 é submetida a atraso, erro, queda do servidor, perda de mensagem no canal e falhas simultâneas, e o cliente ganha retry com backoff, failover e circuit breaker. Sem chave de idempotência, o retry transformou uma intenção em três empréstimos. |
+| **AP6** | Passa de uma cópia do estado para várias. O hash encadeado detecta qualquer adulteração; mesmo assim, um atacante que reescreve a própria cópia a torna válida de novo, e duas réplicas separadas por uma partição podem ser válidas e discordar. Integridade não é consenso. |
+| **AP9** | Pergunta como se sabe o que aconteceu. Um gateway com failover na frente de duas réplicas, logs JSON com `correlation_id` e spans nos três processos, e sete experimentos de carga e caos. O cliente viu 0% de erro enquanto uma réplica falhava, a média ficou "boa" com um p99 de meio segundo, e o gargalo mudou de processo sem a latência do cliente mostrar onde. |
+| **TP1** | Usa o que as atividades separaram: MQTT no campo (AP3), gRPC entre clientes e controladores (AP4), identificador de requisição com failover (AP5) e réplicas que podem discordar (AP6). A diferença é que agora uma das cópias pode mentir de propósito. A resposta vem em camadas: votação por maioria no cliente, quarentena entre controladores e quórum de 2 nos atuadores, para que nenhum controlador sozinho consiga silenciar a sirene. |
 
+<<<<<<< Updated upstream
 **A Atividade 2** troca o protocolo próprio pelo HTTP e descobre que aqueles problemas já
 tinham solução padronizada: o prefixo `FORMATO|` vira `Content-Type`, o `ACK` que evitava a
 junção de pacotes vira `Content-Length`, e os códigos de status substituem convenções
@@ -80,6 +108,9 @@ podem discordar (AP6). A diferença é que agora uma das cópias pode mentir de 
 vem em camadas: votação por maioria no cliente, quarentena entre controladores e quórum de 2 nos
 atuadores, para que nenhum controlador sozinho consiga silenciar a sirene.
 >>>>>>> origin
+=======
+### Os quatro estilos de comunicação lado a lado
+>>>>>>> Stashed changes
 
 | | AP1 | AP2 | AP3 | AP4 |
 | --- | --- | --- | --- | --- |
@@ -92,6 +123,7 @@ atuadores, para que nenhum controlador sozinho consiga silenciar a sirene.
 | **Quem conhece quem** | endereço fixo | cliente conhece a URL | ninguém conhece ninguém | cliente conhece método e endereço |
 | **Canal de erro** | nenhum | status HTTP | não existe | status gRPC |
 
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 A tabela compara os estilos de comunicação das quatro primeiras atividades. As atividades 5, 6
 e 8 não introduzem um estilo novo. Usam o que veio antes para estudar falhas, acordo entre
@@ -102,11 +134,15 @@ não introduzem um estilo novo. Usam o que veio antes para estudar falhas, acord
 medição. O TP1 combina dois estilos no mesmo sistema: publish/subscribe no campo e chamada de
 procedimento entre clientes e controladores.
 >>>>>>> origin
+=======
+As atividades 5, 6 e 9 não introduzem um estilo novo: usam o que veio antes para estudar falhas, acordo entre cópias e medição. O TP1 combina dois estilos no mesmo sistema — publish/subscribe no campo e chamada de procedimento entre clientes e controladores.
+>>>>>>> Stashed changes
 
 ---
 
 ## 🛠️ Tecnologias utilizadas
 
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 | Camada | AP1 | AP2 | AP3 | AP4 | AP5 | AP6 | AP8 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -129,11 +165,26 @@ Atividade 8.
 
 **Linguagem:** Python nas atividades 1 a 5 e 9, e Java 21 na Atividade 6 e no TP1.
 >>>>>>> origin
+=======
+**Linguagem:** Python nas atividades 1 a 5 e 9; Java 21 na Atividade 6 e no TP1.
+
+| | Comunicação | Serialização | Persistência | Infraestrutura | Testes |
+| --- | --- | --- | --- | --- | --- |
+| **AP1** | `socket` (TCP/IP) | CSV, JSON, XML, YAML, TOML | — | — | manual |
+| **AP2** | FastAPI / HTTP | JSON + Pydantic | SQLite (`sqlite3` puro) | — | `pytest` (45) |
+| **AP3** | `paho-mqtt` (MQTT 5) | JSON (envelope próprio) | SQLite (deduplicação) | Mosquitto 2 em Docker | `pytest` (61) |
+| **AP4** | `grpcio` / HTTP/2 | Protocol Buffers | memória com trava | — | `pytest` (58) |
+| **AP5** | FastAPI + `requests` e proxy TCP de falhas | JSON + Pydantic | SQLite (`sqlite3` puro) | servidores em subprocesso | `pytest` (81) |
+| **AP6** | réplicas em memória, sem rede | JSON canônico + SHA-256 | memória (cadeias imutáveis) | Maven multimódulo | 54 verificações nos experimentos |
+| **AP9** | FastAPI + `httpx` (gateway) e proxy TCP de falhas | JSON; logs em JSON Lines | catálogo sintético em memória | 3 serviços em subprocesso, `psutil` | `pytest` (65) e 60 verificações nos experimentos |
+| **TP1** | gRPC 1.68 (clientes e replicação) e MQTT com Paho | Protocol Buffers e JSON (Jackson) assinado com HMAC-SHA256 | H2 em arquivo, um banco por controlador | Spring Boot 3.5, Maven multimódulo, broker Moquette embutido, scripts PowerShell | roteiro de demonstração pelo painel |
+>>>>>>> Stashed changes
 
 ---
 
 ## 🗂️ Organização do repositório
 
+<<<<<<< Updated upstream
 Cada atividade tem a sua própria pasta e o seu próprio branch, com dependências independentes:
 <<<<<<< HEAD
 ambiente virtual Python nas atividades 1 a 5, projeto Maven na 6 e projeto Foundry na 8. Nada é compartilhado entre
@@ -168,273 +219,224 @@ Cada pasta traz o roteiro de execução no seu README e, quando existe, em `docs
 geram evidências reproduzíveis em `evidencias/`, e a 9 também tem uma bateria de experimentos. O
 TP1 se demonstra por um roteiro no painel web.
 >>>>>>> origin
+=======
+```text
+Sistemas-Distribuidos/
+├── Atividade-Pratica-1/   serialização em texto e cliente-servidor com sockets
+├── Atividade-Pratica-2/   API REST com FastAPI e SQLite
+├── Atividade-Pratica-3/   publish/subscribe com MQTT e Mosquitto
+├── Atividade-Pratica-4/   serviço remoto com gRPC e Protocol Buffers
+├── Atividade-Pratica-5/   falhas controladas, retry, circuit breaker e segurança sobre a API da AP2
+├── Atividade-Pratica-6/   blockchain didática em Java: integridade, réplicas e consenso
+├── Atividade-Pratica-9/   testes, observabilidade e medição: carga, correlação, traces e caos
+└── Trabalho-Pratico-1/    alarme de barragem: sensores MQTT, controladores replicados e clientes gRPC
+```
+
+- Cada atividade tem **a sua própria pasta e o seu próprio branch**, com dependências independentes: ambiente virtual Python nas atividades 1 a 5 e 9, e projeto Maven na 6 e no TP1.
+- Nada é compartilhado entre elas além do domínio modelado. A AP5 parte de uma cópia da API da AP2, e a AP2 original não é alterada.
+- Cada pasta traz o **roteiro de execução** no seu README e, quando existe, em `docs/`.
+- As atividades 2 a 5 e a 9 têm suítes de teste com `pytest`. A 6 se verifica pelos próprios experimentos, que geram evidências reproduzíveis em `evidencias/`, e a 9 também tem uma bateria de experimentos. O TP1 se demonstra por um roteiro no painel web.
+>>>>>>> Stashed changes
 
 ---
 
-## 🚀 Atividades Realizadas
+## 🚀 Atividades realizadas
 
-### 📍 [Atividade Prática 1](Atividade-Pratica-1/README.MD)
+### 📍 Atividade Prática 1 — Serialização e sockets TCP
+
+📂 [README da atividade](Atividade-Pratica-1/README.MD)
 
 #### 1.1 — Formatos de serialização baseados em texto
 
-> Estudo comparativo prático sobre como diferentes linguagens estruturam e serializam a mesma
-> informação em texto puro. Com um conjunto de dados padronizado, a atividade evidencia as
-> diferenças de sintaxe, o tratamento de estruturas aninhadas e o custo de legibilidade.
+> Estudo comparativo prático sobre como diferentes linguagens estruturam e serializam a mesma informação em texto puro. Com um conjunto de dados padronizado, a atividade evidencia as diferenças de sintaxe, o tratamento de estruturas aninhadas e o custo de legibilidade.
 
-* **Conceitos estudados:** serialização e desserialização; representação de tipos em texto;
-  aninhamento de estruturas; verbosidade contra legibilidade.
-* **Formatos analisados:** [`CSV`](Atividade-Pratica-1/csv.csv),
-  [`JSON`](Atividade-Pratica-1/json.json), [`XML`](Atividade-Pratica-1/xml.xml),
-  [`YAML`](Atividade-Pratica-1/yaml.yaml) e [`TOML`](Atividade-Pratica-1/toml.toml).
-* **Principais aprendizados:** cada formato otimiza uma coisa diferente. CSV é tabular e não
-  representa aninhamento; JSON domina APIs modernas por ser simples de gerar e consumir; XML
-  sobrevive em sistemas legados e fiscais por causa de esquemas e validação; YAML e TOML
-  ganharam espaço em configuração e DevOps por priorizarem a leitura humana.
+- **Conceitos estudados:** serialização e desserialização; representação de tipos em texto; aninhamento de estruturas; verbosidade contra legibilidade.
+- **Formatos analisados:** [`CSV`](Atividade-Pratica-1/csv.csv), [`JSON`](Atividade-Pratica-1/json.json), [`XML`](Atividade-Pratica-1/xml.xml), [`YAML`](Atividade-Pratica-1/yaml.yaml) e [`TOML`](Atividade-Pratica-1/toml.toml).
+- **Principais aprendizados:** cada formato otimiza uma coisa diferente. CSV é tabular e não representa aninhamento; JSON domina APIs modernas por ser simples de gerar e consumir; XML sobrevive em sistemas legados e fiscais por causa de esquemas e validação; YAML e TOML ganharam espaço em configuração e DevOps por priorizarem a leitura humana.
 
 #### 1.2 — Cliente-servidor com sockets TCP
 
-> Sistema de troca de mensagens em rede que transmite o mesmo conjunto de dados (Nome, CPF,
-> Idade, Mensagem) nos cinco formatos, sequencialmente. O
-> [cliente](Atividade-Pratica-1/Atividade-1.2/cliente.py) empacota e envia; o
-> [servidor](Atividade-Pratica-1/Atividade-1.2/servidor.py) identifica o formato, desserializa
-> e imprime os dados já convertidos em dicionário.
+> Sistema de troca de mensagens em rede que transmite o mesmo conjunto de dados (Nome, CPF, Idade, Mensagem) nos cinco formatos, sequencialmente. O [cliente](Atividade-Pratica-1/Atividade-1.2/cliente.py) empacota e envia; o [servidor](Atividade-Pratica-1/Atividade-1.2/servidor.py) identifica o formato, desserializa e imprime os dados já convertidos em dicionário.
 
-* **Conceitos estudados:** sockets TCP/IP; o modelo cliente-servidor; TCP como fluxo de bytes
-  sem fronteiras de mensagem; enquadramento (*framing*); confirmação de recebimento.
-* **Protocolo de aplicação próprio:** cada mensagem viaja como `FORMATO|payload`. O prefixo é
-  o que permite ao servidor escolher o desserializador, já que os bytes chegam sem nenhuma
-  indicação de tipo.
-* **Controle de fluxo:** o servidor responde `OK` a cada mensagem e o cliente só envia a
-  próxima depois disso. Sem esse `ACK`, duas mensagens enviadas em sequência podem ser
-  entregues em um único `recv`, porque o TCP garante ordem e entrega — mas não preserva as
-  fronteiras de quem enviou.
-* **Principais aprendizados:** a percepção central da atividade é que **"enviei duas mensagens"
-  não significa "chegaram duas mensagens"**. Todo protocolo de aplicação sobre TCP precisa
-  resolver enquadramento e identificação de conteúdo — e é exatamente isso que os protocolos
-  padronizados das atividades seguintes já resolvem.
+- **Conceitos estudados:** sockets TCP/IP; o modelo cliente-servidor; TCP como fluxo de bytes sem fronteiras de mensagem; enquadramento (*framing*); confirmação de recebimento.
+- **Protocolo de aplicação próprio:** cada mensagem viaja como `FORMATO|payload`. O prefixo é o que permite ao servidor escolher o desserializador, já que os bytes chegam sem nenhuma indicação de tipo.
+- **Controle de fluxo:** o servidor responde `OK` a cada mensagem e o cliente só envia a próxima depois disso. Sem esse `ACK`, duas mensagens enviadas em sequência podem ser entregues em um único `recv`, porque o TCP garante ordem e entrega — mas não preserva as fronteiras de quem enviou.
+
+**💡 Principais aprendizados:** a percepção central da atividade é que **"enviei duas mensagens" não significa "chegaram duas mensagens"**. Todo protocolo de aplicação sobre TCP precisa resolver enquadramento e identificação de conteúdo — e é exatamente isso que os protocolos padronizados das atividades seguintes já resolvem.
 
 ---
 
-### 📍 [Atividade Prática 2](Atividade-Pratica-2/README.MD)
+### 📍 Atividade Prática 2 — API REST do acervo de uma biblioteca
 
-#### API REST de gerenciamento de acervo de biblioteca
+📂 [README da atividade](Atividade-Pratica-2/README.MD)
 
-> Construção de uma API REST completa sobre HTTP, saindo do protocolo próprio da Atividade 1
-> para um protocolo de aplicação padronizado. O domínio é o acervo de uma biblioteca, com duas
-> coleções relacionadas: **livros** e os **empréstimos** de cada livro.
+> Construção de uma API REST completa sobre HTTP, saindo do protocolo próprio da Atividade 1 para um protocolo de aplicação padronizado. O domínio é o acervo de uma biblioteca, com duas coleções relacionadas: **livros** e os **empréstimos** de cada livro.
 
-A virada conceitual está em perceber que os problemas resolvidos manualmente na Atividade 1 já
-tinham solução no HTTP: o prefixo `FORMATO|payload` vira o cabeçalho `Content-Type`, e o `ACK`
-que evitava a junção de pacotes no TCP vira o `Content-Length`.
+A virada conceitual está em perceber que os problemas resolvidos manualmente na Atividade 1 já tinham solução no HTTP: o prefixo `FORMATO|payload` vira o cabeçalho `Content-Type`, e o `ACK` que evitava a junção de pacotes no TCP vira o `Content-Length`.
 
-* **Conceitos estudados:** recurso contra representação; semântica dos métodos HTTP;
-  idempotência; negociação de conteúdo; concorrência otimista; paginação; observabilidade.
-* **Recursos implementados:** 13 endpoints — 10 de domínio cobrindo `GET`, `POST`, `PUT`,
-  `PATCH` e `DELETE`, com sub-recurso aninhado (`/v1/livros/{id}/emprestimos`), mais 3 de
-  diagnóstico (`/v1/saude`, `/v1/lento`, `/v1/indisponivel`) usados nos experimentos de timeout
-  e indisponibilidade.
-* **Semântica HTTP:** uso deliberado de `200`, `201`, `204`, `304`, `404`, `409`, `412`, `422`
-  e `503`, com `Location` na criação e `Retry-After` na indisponibilidade.
-* **Validação:** modelos Pydantic separados para entrada e saída, com `extra="forbid"`
-  rejeitando campos desconhecidos em vez de ignorá-los em silêncio.
-* **Tratamento de erros:** envelope único em `application/problem+json`, traduzindo erros
-  técnicos do banco em erros de domínio sem vazar detalhes internos.
-* **Concorrência:** controle otimista com `ETag`/`If-Match` (`412`) e validação condicional com
-  `If-None-Match` (`304`), demonstrando a perda de atualização e o mecanismo que a impede.
-* **Observabilidade:** log estruturado em JSON com identificador de correlação, método,
-  caminho, status e duração de cada requisição.
-* **Testes:** 45 testes automatizados em `pytest` e 8 cenários com cliente programático que
-  geram a tabela de evidências automaticamente.
-* **Principais aprendizados:** a distinção entre recurso e representação; idempotência como
-  propriedade do estado final e não da resposta; e a diferença crítica entre *"o servidor
-  respondeu erro"* e *"o cliente não obteve resposta"* — a segunda deixa o cliente sem saber se
-  a operação chegou a ser executada. Essa dúvida reaparece, medida, na Atividade 4.
+- **Conceitos estudados:** recurso contra representação; semântica dos métodos HTTP; idempotência; negociação de conteúdo; concorrência otimista; paginação; observabilidade.
+- **Recursos implementados:** 13 endpoints — 10 de domínio cobrindo `GET`, `POST`, `PUT`, `PATCH` e `DELETE`, com sub-recurso aninhado (`/v1/livros/{id}/emprestimos`), mais 3 de diagnóstico (`/v1/saude`, `/v1/lento`, `/v1/indisponivel`) usados nos experimentos de timeout e indisponibilidade.
+- **Semântica HTTP:** uso deliberado de `200`, `201`, `204`, `304`, `404`, `409`, `412`, `422` e `503`, com `Location` na criação e `Retry-After` na indisponibilidade.
+- **Validação:** modelos Pydantic separados para entrada e saída, com `extra="forbid"` rejeitando campos desconhecidos em vez de ignorá-los em silêncio.
+- **Tratamento de erros:** envelope único em `application/problem+json`, traduzindo erros técnicos do banco em erros de domínio sem vazar detalhes internos.
+- **Concorrência:** controle otimista com `ETag`/`If-Match` (`412`) e validação condicional com `If-None-Match` (`304`), demonstrando a perda de atualização e o mecanismo que a impede.
+- **Observabilidade:** log estruturado em JSON com identificador de correlação, método, caminho, status e duração de cada requisição.
+- **Testes:** 45 testes automatizados em `pytest` e 8 cenários com cliente programático que geram a tabela de evidências automaticamente.
+
+**💡 Principais aprendizados:** a distinção entre recurso e representação; idempotência como propriedade do estado final e não da resposta; e a diferença crítica entre *"o servidor respondeu erro"* e *"o cliente não obteve resposta"* — a segunda deixa o cliente sem saber se a operação chegou a ser executada. Essa dúvida reaparece, medida, na Atividade 4.
 
 ---
 
-### 📍 [Atividade Prática 3](Atividade-Pratica-3/README.MD)
+### 📍 Atividade Prática 3 — Publish/subscribe com MQTT
 
-#### Publish/subscribe com MQTT e broker Mosquitto
+📂 [README da atividade](Atividade-Pratica-3/README.MD)
 
-> Mesma biblioteca, outro estilo: em vez de um cliente chamando um servidor, um **terminal de
-> autoatendimento** publica eventos de empréstimo e devolução em tópicos, e dois consumidores
-> independentes — um **painel de acervo** e um **serviço de atrasos** — reagem a eles sem que o
-> publicador saiba que existem.
+> Mesma biblioteca, outro estilo: em vez de um cliente chamando um servidor, um **terminal de autoatendimento** publica eventos de empréstimo e devolução em tópicos, e dois consumidores independentes — um **painel de acervo** e um **serviço de atrasos** — reagem a eles sem que o publicador saiba que existem.
 
-A pergunta que organiza a atividade é o que exatamente o broker desacopla, e quanto custa cada
-garantia de entrega que ele oferece.
+A pergunta que organiza a atividade é o que exatamente o broker desacopla, e quanto custa cada garantia de entrega que ele oferece.
 
-* **Conceitos estudados:** desacoplamento espacial, temporal e de sincronia; roteamento por
-  tópicos e curingas; níveis de QoS; mensagem retida; Last Will; sessão persistente contra
-  efêmera; deduplicação idempotente; *backpressure*.
-* **Taxonomia de tópicos:** `biblioteca/{unidade}/{terminal}/{evento}`, com filtros por
-  curinga (`biblioteca/+/+/emprestimo`) validados por testes. A hierarquia é o que permite a um
-  consumidor assinar uma unidade inteira sem conhecer os terminais.
-* **Envelope versionado:** toda mensagem carrega `message_id`, `producer_id`, `sequence`,
-  `schema_version`, `timestamp` e `data`. Como não existe contrato no protocolo, o envelope
-  é o contrato — e o `schema_version` é o que permite evoluí-lo.
-* **Infraestrutura:** Mosquitto 2 em Docker Compose, com persistência habilitada, expiração de
-  sessão e fila limitada, para que os experimentos de queda e de retomada sejam reproduzíveis.
-* **Resiliência do cliente:** reconexão com *backoff* exponencial e *jitter*, parada limpa e
-  `Last Will` registrado no CONNECT.
-* **Sete experimentos automatizados**, cada um respondendo a uma pergunta:
+- **Conceitos estudados:** desacoplamento espacial, temporal e de sincronia; roteamento por tópicos e curingas; níveis de QoS; mensagem retida; Last Will; sessão persistente contra efêmera; deduplicação idempotente; *backpressure*.
+- **Taxonomia de tópicos:** `biblioteca/{unidade}/{terminal}/{evento}`, com filtros por curinga (`biblioteca/+/+/emprestimo`) validados por testes. A hierarquia é o que permite a um consumidor assinar uma unidade inteira sem conhecer os terminais.
+- **Envelope versionado:** toda mensagem carrega `message_id`, `producer_id`, `sequence`, `schema_version`, `timestamp` e `data`. Como não existe contrato no protocolo, o envelope é o contrato — e o `schema_version` é o que permite evoluí-lo.
+- **Infraestrutura:** Mosquitto 2 em Docker Compose, com persistência habilitada, expiração de sessão e fila limitada, para que os experimentos de queda e de retomada sejam reproduzíveis.
+- **Resiliência do cliente:** reconexão com *backoff* exponencial e *jitter*, parada limpa e `Last Will` registrado no CONNECT.
+- **Testes:** 61 testes de `pytest` sobre o envelope, a taxonomia de tópicos e a deduplicação.
 
-  | | Experimento | Pergunta |
-  | --- | --- | --- |
-  | E01 | Desacoplamento e roteamento por tópicos | O que exatamente foi desacoplado pelo broker? |
-  | E02 | QoS 0 contra QoS 1 com o broker fora | O QoS escolhido é suficiente para o requisito? |
-  | E03 | Retained como último valor conhecido | Quando retained é apropriado e quando é perigoso? |
-  | E04 | Last Will e desconexão anormal | Como o sistema percebe que um produtor caiu sem avisar? |
-  | E05 | Duplicação em QoS 2 e deduplicação | Como o sistema identifica mensagem duplicada? |
-  | E06 | Consumidor lento e backpressure | A lentidão do consumidor vira perda ou atraso? |
-  | E07 | Sessão persistente contra efêmera | O que acontece com o que foi produzido enquanto o consumidor estava fora? |
+<details>
+<summary>🧪 <b>Sete experimentos automatizados</b>, cada um respondendo a uma pergunta</summary>
 
-* **Testes:** 61 testes de `pytest` sobre o envelope, a taxonomia de tópicos e a deduplicação.
-* **Principais aprendizados:** o broker desacopla **quem** e **quando**, mas não o **formato** —
-  o acoplamento migra da URL para o envelope. QoS 1 é *pelo menos uma vez*, e "pelo menos uma"
-  significa que duplicar é comportamento esperado, não falha: só a deduplicação por
-  `message_id` evita cobrar a mesma multa duas vezes. E a lentidão de um consumidor não vira
-  perda, vira fila — até a fila estourar.
+<br>
+
+| | Experimento | Pergunta |
+| --- | --- | --- |
+| E01 | Desacoplamento e roteamento por tópicos | O que exatamente foi desacoplado pelo broker? |
+| E02 | QoS 0 contra QoS 1 com o broker fora | O QoS escolhido é suficiente para o requisito? |
+| E03 | Retained como último valor conhecido | Quando retained é apropriado e quando é perigoso? |
+| E04 | Last Will e desconexão anormal | Como o sistema percebe que um produtor caiu sem avisar? |
+| E05 | Duplicação em QoS 2 e deduplicação | Como o sistema identifica mensagem duplicada? |
+| E06 | Consumidor lento e backpressure | A lentidão do consumidor vira perda ou atraso? |
+| E07 | Sessão persistente contra efêmera | O que acontece com o que foi produzido enquanto o consumidor estava fora? |
+
+</details>
+
+**💡 Principais aprendizados:** o broker desacopla **quem** e **quando**, mas não o **formato** — o acoplamento migra da URL para o envelope. QoS 1 é *pelo menos uma vez*, e "pelo menos uma" significa que duplicar é comportamento esperado, não falha: só a deduplicação por `message_id` evita cobrar a mesma multa duas vezes. E a lentidão de um consumidor não vira perda, vira fila — até a fila estourar.
 
 ---
 
-### 📍 [Atividade Prática 4](Atividade-Pratica-4/README.MD)
+### 📍 Atividade Prática 4 — Serviço remoto com gRPC e Protocol Buffers
 
-#### Serviço remoto de empréstimos com gRPC e Protocol Buffers
+📂 [README da atividade](Atividade-Pratica-4/README.MD)
 
-> A mesma biblioteca de novo, agora como chamada de procedimento remoto. O contrato é escrito
-> primeiro, em um arquivo `.proto`, e o código do cliente e do servidor é **gerado** a partir
-> dele. A atividade gira em torno de uma pergunta: o que a abstração de "chamada de função"
-> esconde, e o que acontece quando ela vaza.
+> A mesma biblioteca de novo, agora como chamada de procedimento remoto. O contrato é escrito primeiro, em um arquivo `.proto`, e o código do cliente e do servidor é **gerado** a partir dele. A atividade gira em torno de uma pergunta: o que a abstração de "chamada de função" esconde, e o que acontece quando ela vaza.
 
-* **Conceitos estudados:** a ilusão de chamada local; IDL e geração de *stubs*; *marshalling* e
-  formato binário; tipos de RPC; deadlines e cancelamento; propagação de orçamento de tempo;
-  modelo de status de erro; idempotência e retry seguro; evolução de contrato; interceptors.
-* **Contrato:** 5 métodos RPC e 11 mensagens próprias em
-  [`emprestimos.proto`](Atividade-Pratica-4/contratos/emprestimos.proto) — quatro chamadas
-  unárias e uma de *server streaming*. A geração dos stubs é reproduzível do zero, verificada
-  por comparação de hash SHA-256.
-* **Modelo de erro:** erros de domínio traduzidos em um único ponto para `INVALID_ARGUMENT`,
-  `NOT_FOUND`, `FAILED_PRECONDITION` e `ALREADY_EXISTS`, com o campo inválido devolvido no
-  *trailing metadata*. Cada status carrega a política de retry que ele implica.
-* **Interceptors:** correlação e métricas nas duas pontas, mais a tradução de erro no servidor.
-  O serviço não decide códigos de status; a regra de negócio continua visível e testável.
-* **Evolução de contrato:** três versões do `.proto` no repositório — a atual, a anterior e um
-  contra-exemplo com mudanças proibidas — usadas para medir o que preserva clientes antigos e o
-  que os quebra.
-* **Sete experimentos automatizados**, com 90 verificações e uma tabela de latência e status por
-  chamada gerada a cada execução:
+- **Conceitos estudados:** a ilusão de chamada local; IDL e geração de *stubs*; *marshalling* e formato binário; tipos de RPC; deadlines e cancelamento; propagação de orçamento de tempo; modelo de status de erro; idempotência e retry seguro; evolução de contrato; interceptors.
+- **Contrato:** 5 métodos RPC e 11 mensagens próprias em [`emprestimos.proto`](Atividade-Pratica-4/contratos/emprestimos.proto) — quatro chamadas unárias e uma de *server streaming*. A geração dos stubs é reproduzível do zero, verificada por comparação de hash SHA-256.
+- **Modelo de erro:** erros de domínio traduzidos em um único ponto para `INVALID_ARGUMENT`, `NOT_FOUND`, `FAILED_PRECONDITION` e `ALREADY_EXISTS`, com o campo inválido devolvido no *trailing metadata*. Cada status carrega a política de retry que ele implica.
+- **Interceptors:** correlação e métricas nas duas pontas, mais a tradução de erro no servidor. O serviço não decide códigos de status; a regra de negócio continua visível e testável.
+- **Evolução de contrato:** três versões do `.proto` no repositório — a atual, a anterior e um contra-exemplo com mudanças proibidas — usadas para medir o que preserva clientes antigos e o que os quebra.
+- **Testes:** 58 testes de `pytest`, subindo o servidor em porta efêmera dentro do processo.
 
-  | | Experimento | O que demonstra |
-  | --- | --- | --- |
-  | E01 | Contrato, stubs e fluxo unário/streaming | stubs byte a byte idênticos ao regenerar |
-  | E02 | Erros de domínio contra status gRPC | cinco status distintos para causas distintas |
-  | E03 | Deadlines de 100 ms, 1 s e 3 s | o servidor abandona a chamada em 4 de 40 itens |
-  | E04 | Indisponibilidade do servidor | mesmo pedido, dois eixos de erro diferentes |
-  | E05 | Concorrência e `max_workers` | p95 cai de ~1,2 s para ~0,3 s; 12 clientes, 1 exemplar |
-  | E06 | Retry após deadline ambíguo | sem chave o retry duplica; com chave, não |
-  | E07 | Evolução de contrato | mudança incompatível corrompe em silêncio |
+<details>
+<summary>🧪 <b>Sete experimentos automatizados</b>, com 90 verificações e tabela de latência e status por chamada</summary>
 
-* **Testes:** 58 testes de `pytest`, subindo o servidor em porta efêmera dentro do processo.
-* **Principais aprendizados:** três medições resumem a atividade. **(1)** O cliente registrou
-  `DEADLINE_EXCEEDED` para uma chamada que o servidor concluiu com `OK` — uma chamada remota
-  tem um terceiro resultado além de "deu certo" e "deu erro": *não se sabe*. **(2)** O mesmo
-  pedido inválido devolve `INVALID_ARGUMENT` com o servidor no ar e `UNAVAILABLE` com ele fora,
-  o que separa erro de aplicação de falha de infraestrutura. **(3)** As mudanças incompatíveis
-  no `.proto` não levantam exceção nenhuma: reaproveitar um número de campo faz o dado chegar
-  corrompido, e trocar o tipo faz o valor sumir — as duas em silêncio.
+<br>
+
+| | Experimento | O que demonstra |
+| --- | --- | --- |
+| E01 | Contrato, stubs e fluxo unário/streaming | stubs byte a byte idênticos ao regenerar |
+| E02 | Erros de domínio contra status gRPC | cinco status distintos para causas distintas |
+| E03 | Deadlines de 100 ms, 1 s e 3 s | o servidor abandona a chamada em 4 de 40 itens |
+| E04 | Indisponibilidade do servidor | mesmo pedido, dois eixos de erro diferentes |
+| E05 | Concorrência e `max_workers` | p95 cai de ~1,2 s para ~0,3 s; 12 clientes, 1 exemplar |
+| E06 | Retry após deadline ambíguo | sem chave o retry duplica; com chave, não |
+| E07 | Evolução de contrato | mudança incompatível corrompe em silêncio |
+
+</details>
+
+**💡 Principais aprendizados** — três medições resumem a atividade:
+
+1. O cliente registrou `DEADLINE_EXCEEDED` para uma chamada que o servidor concluiu com `OK` — uma chamada remota tem um terceiro resultado além de "deu certo" e "deu erro": *não se sabe*.
+2. O mesmo pedido inválido devolve `INVALID_ARGUMENT` com o servidor no ar e `UNAVAILABLE` com ele fora, o que separa erro de aplicação de falha de infraestrutura.
+3. As mudanças incompatíveis no `.proto` não levantam exceção nenhuma: reaproveitar um número de campo faz o dado chegar corrompido, e trocar o tipo faz o valor sumir — as duas em silêncio.
 
 ---
 
-### 📍 [Atividade Prática 5](Atividade-Pratica-5/README.MD)
+### 📍 Atividade Prática 5 — Interação, falhas e segurança
 
-#### Experimentos com interação, falhas e segurança
+📂 [README da atividade](Atividade-Pratica-5/README.MD)
 
-> A API REST da AP2, copiada e estendida, vira o sistema sob teste. As falhas são injetadas em
-> três lugares: no servidor (rota instável e atraso depois da escrita), no canal (um proxy TCP
-> que perde a requisição, perde a resposta ou atrasa) e no processo (encerrar, religar e matar
-> o servidor). Cada lugar produz uma classe diferente do modelo de falhas.
+> A API REST da AP2, copiada e estendida, vira o sistema sob teste. As falhas são injetadas em três lugares: no servidor (rota instável e atraso depois da escrita), no canal (um proxy TCP que perde a requisição, perde a resposta ou atrasa) e no processo (encerrar, religar e matar o servidor). Cada lugar produz uma classe diferente do modelo de falhas.
 
-* **Conceitos estudados:** modelos de interação e de falhas; timeout; retry; backoff com
-  *jitter*; *failover*; *circuit breaker*; idempotência; a diferença entre observar e inferir;
-  controle de acesso.
-* **Resiliência do cliente:** cada tentativa é medida e classificada (duração, status e tipo de
-  erro). Só falhas transitórias são repetidas, com backoff exponencial e jitter. Há alternância
-  entre réplicas e um disjuntor simples.
-* **Idempotência:** o registro de empréstimo aceita `Idempotency-Key`, gravada na mesma
-  transação do efeito.
-* **Correlação:** o cliente envia o mesmo `X-Request-ID` em todas as tentativas de uma chamada.
-  É isso que permite comparar o que o cliente viu com o que o servidor fez.
-* **Segurança:** token Bearer com autorização por papel (`401` e `403`), validação robusta
-  (`422`) e rota de laboratório desligada por padrão, para a ferramenta de teste não virar
-  vetor de negação de serviço.
-* **Dez cenários automatizados**, com 69 verificações e 261 tentativas medidas por execução:
+- **Conceitos estudados:** modelos de interação e de falhas; timeout; retry; backoff com *jitter*; *failover*; *circuit breaker*; idempotência; a diferença entre observar e inferir; controle de acesso.
+- **Resiliência do cliente:** cada tentativa é medida e classificada (duração, status e tipo de erro). Só falhas transitórias são repetidas, com backoff exponencial e jitter. Há alternância entre réplicas e um disjuntor simples.
+- **Idempotência:** o registro de empréstimo aceita `Idempotency-Key`, gravada na mesma transação do efeito.
+- **Correlação:** o cliente envia o mesmo `X-Request-ID` em todas as tentativas de uma chamada. É isso que permite comparar o que o cliente viu com o que o servidor fez.
+- **Segurança:** token Bearer com autorização por papel (`401` e `403`), validação robusta (`422`) e rota de laboratório desligada por padrão, para a ferramenta de teste não virar vetor de negação de serviço.
+- **Testes:** 81 testes de `pytest`, os 45 herdados da AP2 e 36 novos.
 
-  | | Cenário | Resultado principal |
-  | --- | --- | --- |
-  | E01 | referência, sem falha | 40/40 com `200`; p95 ≈ 30 ms |
-  | E02 | atraso de 800 ms no servidor | cliente vê timeout, servidor registra `200` |
-  | E03 | `503` com probabilidade 0,5 | retry com backoff sobe o sucesso de 45% para 95% |
-  | E04 | servidor fora, religado, morto no meio | retry recupera depois de 2 ou 3 tentativas |
-  | E05 | proxy perde requisição, perde resposta, atrasa | quatro causas, a mesma observação |
-  | E06 | escrita lenta + retry | sem chave, 3 empréstimos para 1 intenção; com chave, 1 |
-  | E07 | 20 clientes, 60% de falha | retry imediato concentra tudo; jitter espalha |
-  | E08 | dependência fora do ar | circuit breaker corta de 12 para 3 tentativas |
-  | E09 | duas réplicas falhando juntas | failover mascara uma falha, não duas |
-  | E10 | ataques ao controle de acesso | `401`, `403` e `422` corretos; token visível sem TLS |
+<details>
+<summary>🧪 <b>Dez cenários automatizados</b>, com 69 verificações e 261 tentativas medidas por execução</summary>
 
-* **Testes:** 81 testes de `pytest`, os 45 herdados da AP2 e 36 novos.
-* **Principais aprendizados:**
-  * **Timeout não diz o que aconteceu.** No E05, perder a requisição, perder a resposta e
-    atrasar a resposta produzem a mesma observação: timeout de leitura aos ~520 ms.
-  * **Retry multiplica o efeito.** Numa operação não idempotente, o retry criou três empréstimos
-    para uma única intenção.
-  * **Os mecanismos de resiliência também falham.** Sem jitter, o retry sincroniza os clientes
-    numa tempestade de tráfego, e o failover só cobre a falha que ele previu.
+<br>
+
+| | Cenário | Resultado principal |
+| --- | --- | --- |
+| E01 | referência, sem falha | 40/40 com `200`; p95 ≈ 30 ms |
+| E02 | atraso de 800 ms no servidor | cliente vê timeout, servidor registra `200` |
+| E03 | `503` com probabilidade 0,5 | retry com backoff sobe o sucesso de 45% para 95% |
+| E04 | servidor fora, religado, morto no meio | retry recupera depois de 2 ou 3 tentativas |
+| E05 | proxy perde requisição, perde resposta, atrasa | quatro causas, a mesma observação |
+| E06 | escrita lenta + retry | sem chave, 3 empréstimos para 1 intenção; com chave, 1 |
+| E07 | 20 clientes, 60% de falha | retry imediato concentra tudo; jitter espalha |
+| E08 | dependência fora do ar | circuit breaker corta de 12 para 3 tentativas |
+| E09 | duas réplicas falhando juntas | failover mascara uma falha, não duas |
+| E10 | ataques ao controle de acesso | `401`, `403` e `422` corretos; token visível sem TLS |
+
+</details>
+
+**💡 Principais aprendizados:**
+
+- **Timeout não diz o que aconteceu.** No E05, perder a requisição, perder a resposta e atrasar a resposta produzem a mesma observação: timeout de leitura aos ~520 ms.
+- **Retry multiplica o efeito.** Numa operação não idempotente, o retry criou três empréstimos para uma única intenção.
+- **Os mecanismos de resiliência também falham.** Sem jitter, o retry sincroniza os clientes numa tempestade de tráfego, e o failover só cobre a falha que ele previu.
 
 ---
 
-### 📍 [Atividade Prática 6](Atividade-Pratica-6/README.md)
+### 📍 Atividade Prática 6 — Blockchain didática
 
-#### Blockchain didática: integridade, replicação e consenso
+📂 [README da atividade](Atividade-Pratica-6/README.md)
 
-> Partindo do `explorar_cadeia.py` do material, a cadeia de blocos foi reimplementada em
-> **Java 21**, com hashes idênticos aos do Python, e submetida a adulteração, reescrita e
-> réplicas divergentes. O objetivo é separar o que a criptografia resolve do que ainda depende
-> de um protocolo distribuído.
+> Partindo do `explorar_cadeia.py` do material, a cadeia de blocos foi reimplementada em **Java 21**, com hashes idênticos aos do Python, e submetida a adulteração, reescrita e réplicas divergentes. O objetivo é separar o que a criptografia resolve do que ainda depende de um protocolo distribuído.
 
-* **Conceitos estudados:** hash criptográfico e efeito avalanche; encadeamento; integridade
-  contra consenso; forks como eventos concorrentes; regra de reconciliação; omissão, partição e
-  falha bizantina.
-* **Arquitetura em módulos e camadas:** quatro módulos Maven, `nucleo` → `integridade` →
-  `replicacao` → `laboratorio`, cada um com `module-info.java`. O compilador impede que uma
-  camada de baixo importe uma de cima.
-* **Port fiel ao original:** um serializador canônico reproduz o `json.dumps(sort_keys=True)`
-  do Python. Os 4 hashes da cadeia do PDF e os 25 da cadeia de referência foram conferidos no
-  código original.
-* **Reprodutibilidade:** com semente fixa, duas execuções geram as evidências idênticas byte a
-  byte, inclusive o diagrama em PNG.
-* **Cinco experimentos automatizados**, com 54 verificações:
+- **Conceitos estudados:** hash criptográfico e efeito avalanche; encadeamento; integridade contra consenso; forks como eventos concorrentes; regra de reconciliação; omissão, partição e falha bizantina.
+- **Arquitetura em módulos e camadas:** quatro módulos Maven, `nucleo` → `integridade` → `replicacao` → `laboratorio`, cada um com `module-info.java`. O compilador impede que uma camada de baixo importe uma de cima.
+- **Port fiel ao original:** um serializador canônico reproduz o `json.dumps(sort_keys=True)` do Python. Os 4 hashes da cadeia do PDF e os 25 da cadeia de referência foram conferidos no código original.
+- **Reprodutibilidade:** com semente fixa, duas execuções geram as evidências idênticas byte a byte, inclusive o diagrama em PNG.
 
-  | | Experimento | Resultado principal |
-  | --- | --- | --- |
-  | E01 | cadeia didática e referência | hashes idênticos aos do Python; 25 blocos válidos |
-  | E02 | avalanche | 1 caractere muda em média 50,4% dos 256 bits |
-  | E03 | adulteração de bloco antigo | detectada exatamente no bloco alterado, nas 4 posições |
-  | E04 | reescrita da cadeia | com 20 hashes recalculados, a fraude volta a ser "cadeia válida" |
-  | E05 | réplicas divergentes | na partição, 4 transações voltam à fila; a fraude reescrita e mais longa vence |
+<details>
+<summary>🧪 <b>Cinco experimentos automatizados</b>, com 54 verificações</summary>
 
-* **Principais aprendizados:**
-  * **O hash detecta, mas não impede.** A validação local apontou toda adulteração. Mesmo
-    assim, recalcular os hashes seguintes "conserta" a cópia, porque o hash garante coerência
-    interna, não a história verdadeira.
-  * **A fraude tem a forma de um fork.** Para quem compara, a cadeia reescrita tem um ancestral
-    comum e dois ramos válidos, como um fork legítimo. Escolher entre eles é tarefa do consenso.
-  * **Uma regra sem custo é fraudável.** "A mais longa vence" aceitou a fraude com um único
-    bloco extra. Protocolos reais exigem trabalho ou stake, assinaturas e maioria honesta.
+<br>
+
+| | Experimento | Resultado principal |
+| --- | --- | --- |
+| E01 | cadeia didática e referência | hashes idênticos aos do Python; 25 blocos válidos |
+| E02 | avalanche | 1 caractere muda em média 50,4% dos 256 bits |
+| E03 | adulteração de bloco antigo | detectada exatamente no bloco alterado, nas 4 posições |
+| E04 | reescrita da cadeia | com 20 hashes recalculados, a fraude volta a ser "cadeia válida" |
+| E05 | réplicas divergentes | na partição, 4 transações voltam à fila; a fraude reescrita e mais longa vence |
+
+</details>
+
+**💡 Principais aprendizados:**
+
+- **O hash detecta, mas não impede.** A validação local apontou toda adulteração. Mesmo assim, recalcular os hashes seguintes "conserta" a cópia, porque o hash garante coerência interna, não a história verdadeira.
+- **A fraude tem a forma de um fork.** Para quem compara, a cadeia reescrita tem um ancestral comum e dois ramos válidos, como um fork legítimo. Escolher entre eles é tarefa do consenso.
+- **Uma regra sem custo é fraudável.** "A mais longa vence" aceitou a fraude com um único bloco extra. Protocolos reais exigem trabalho ou stake, assinaturas e maioria honesta.
 
 ---
 
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 ### 📍 [Atividade Prática 8](Atividade-Pratica-8/README.md)
 
@@ -471,53 +473,52 @@ garantia de entrega que ele oferece.
     mesmo acervo.
 =======
 ### 📍 [Atividade Prática 9](Atividade-Pratica-9/README.md)
+=======
+### 📍 Atividade Prática 9 — Testes, observabilidade e medição
+>>>>>>> Stashed changes
 
-#### Testes, observabilidade e medição
+📂 [README da atividade](Atividade-Pratica-9/README.md)
 
-> Um balcão (gateway com rodízio, failover e quarentena) na frente de duas réplicas do acervo,
-> três processos HTTP reais escrevendo logs JSON com `correlation_id`, `message_id`,
-> `causation_id` e a árvore de spans. Um gerador de carga separa erro de aplicação de erro de
-> transporte, e um proxy TCP perturba o canal sem os serviços saberem. As respostas aos exercícios
-> do capítulo 15 estão em `Questoes-AP9.docx`, na pasta `entregavel/` gerada localmente (fora do repositório).
+> Um balcão (gateway com rodízio, failover e quarentena) na frente de duas réplicas do acervo, três processos HTTP reais escrevendo logs JSON com `correlation_id`, `message_id`, `causation_id` e a árvore de spans. Um gerador de carga separa erro de aplicação de erro de transporte, e um proxy TCP perturba o canal sem os serviços saberem.
 
-* **Conceitos estudados:** teste funcional contra experimento distribuído; percentis e caudas;
-  vazão, saturação e lei de Little; disponibilidade observada; correlação e trace distribuído;
-  chaos engineering com hipótese de estado estável e critério de interrupção; aquecimento e
-  repetibilidade.
-* **Sete experimentos automatizados**, com 60 verificações:
+- **Conceitos estudados:** teste funcional contra experimento distribuído; percentis e caudas; vazão, saturação e lei de Little; disponibilidade observada; correlação e trace distribuído; chaos engineering com hipótese de estado estável e critério de interrupção; aquecimento e repetibilidade.
+- **Testes:** 65 testes de `pytest`, sem rede.
 
-  | | Experimento | Resultado principal |
-  | --- | --- | --- |
-  | E01 | referência e repetibilidade | p50 ~20 ms em 3 execuções; o `medir_latencia.py` do material mede o dobro porque abre conexão a cada chamada |
-  | E02 | média contra percentis | 2,6% de requisições lentas: média 32 ms, p99 521 ms |
-  | E03 | amplificação da cauda | 2% de lentidão por chamada vira 17% com 10 chamadas em paralelo |
-  | E04 | carga e saturação | vazão para em ~188 req/s; com 32 clientes o gargalo migra para o balcão (96% de CPU) |
-  | E05 | correlação e trace | 60/60 operações reconstruídas; 12 erros invisíveis ao cliente ligados à origem |
-  | E06 | caos: réplica morta sob carga | 0 erros e 100% de disponibilidade; quarentena limita a 10 tentativas na réplica morta |
-  | E07 | caos: classes de erro | a mesma indisponibilidade vira sucesso lento, 504, 503 ou conexão recusada, conforme o lugar |
+> [!NOTE]
+> As respostas aos exercícios do capítulo 15 estão em `Questoes-AP9.docx`, na pasta `entregavel/` gerada localmente (fora do repositório).
 
-* **Testes:** 65 testes de `pytest`, sem rede.
-* **Principais aprendizados:**
-  * **A latência do cliente diz que piorou, não onde.** Só a fila e a CPU por processo, com a
-    decomposição por spans, mostraram o gargalo saindo do acervo e indo para o balcão.
-  * **O failover apaga a evidência.** O cliente viu 0% de erro enquanto uma réplica falhava, e só a
-    correlação entre os logs dos três processos mostrou o defeito.
-  * **Medir também é um sistema.** O instrumento do material mediu o custo de abrir conexão junto
-    com o serviço, e no Windows foi preciso ajustar a resolução do relógio para os atrasos medidos
-    serem os configurados.
+<details>
+<summary>🧪 <b>Sete experimentos automatizados</b>, com 60 verificações</summary>
+
+<br>
+
+| | Experimento | Resultado principal |
+| --- | --- | --- |
+| E01 | referência e repetibilidade | p50 ~20 ms em 3 execuções; o `medir_latencia.py` do material mede o dobro porque abre conexão a cada chamada |
+| E02 | média contra percentis | 2,6% de requisições lentas: média 32 ms, p99 521 ms |
+| E03 | amplificação da cauda | 2% de lentidão por chamada vira 17% com 10 chamadas em paralelo |
+| E04 | carga e saturação | vazão para em ~188 req/s; com 32 clientes o gargalo migra para o balcão (96% de CPU) |
+| E05 | correlação e trace | 60/60 operações reconstruídas; 12 erros invisíveis ao cliente ligados à origem |
+| E06 | caos: réplica morta sob carga | 0 erros e 100% de disponibilidade; quarentena limita a 10 tentativas na réplica morta |
+| E07 | caos: classes de erro | a mesma indisponibilidade vira sucesso lento, 504, 503 ou conexão recusada, conforme o lugar |
+
+</details>
+
+**💡 Principais aprendizados:**
+
+- **A latência do cliente diz que piorou, não onde.** Só a fila e a CPU por processo, com a decomposição por spans, mostraram o gargalo saindo do acervo e indo para o balcão.
+- **O failover apaga a evidência.** O cliente viu 0% de erro enquanto uma réplica falhava, e só a correlação entre os logs dos três processos mostrou o defeito.
+- **Medir também é um sistema.** O instrumento do material mediu o custo de abrir conexão junto com o serviço, e no Windows foi preciso ajustar a resolução do relógio para os atrasos medidos serem os configurados.
 
 ---
 
-### 📍 [Trabalho Prático 1](Trabalho-Pratico-1/README.md)
+### 📍 Trabalho Prático 1 — Middleware de alarme para barragem de rejeito
 
-#### Middleware de alarme para barragem de rejeito
+📂 [README do trabalho](Trabalho-Pratico-1/README.md)
 
-> Monitoramento de uma barragem fictícia até a ruptura. Oito sensores publicam leituras
-> assinadas em MQTT, três controladores replicados calculam o nível de risco (NORMAL → ATENÇÃO →
-> N1 → N2 → N3) e acionam sirenes, rota de fuga, cancela e bomba, e dois clientes (painel web e
-> terminal da Defesa Civil) acessam o sistema por gRPC. O tema vem de Brumadinho, onde as sirenes
-> não tocaram: o requisito central é o alarme disparar mesmo com controladores caindo ou mentindo.
+> Monitoramento de uma barragem fictícia até a ruptura. Oito sensores publicam leituras assinadas em MQTT, três controladores replicados calculam o nível de risco (NORMAL → ATENÇÃO → N1 → N2 → N3) e acionam sirenes, rota de fuga, cancela e bomba, e dois clientes (painel web e terminal da Defesa Civil) acessam o sistema por gRPC. O tema vem de Brumadinho, onde as sirenes não tocaram: o requisito central é o alarme disparar mesmo com controladores caindo ou mentindo.
 
+<<<<<<< Updated upstream
 * **Conceitos estudados:** replicação ativa e primário-backup; eleição de líder por heartbeat;
   idempotência com identificador de requisição; votação por maioria e mediana; falha bizantina e
   quarentena; quórum; integridade de mensagens com HMAC; rejeição de replay e checagem de
@@ -538,6 +539,17 @@ garantia de entrega que ele oferece.
 * **Limites declarados:** tolera 1 controlador falho ou malicioso por vez, não trata partição de
   rede e usa chaves HMAC fixas no código, por ser didático.
 >>>>>>> origin
+=======
+- **Conceitos estudados:** replicação ativa e primário-backup; eleição de líder por heartbeat; idempotência com identificador de requisição; votação por maioria e mediana; falha bizantina e quarentena; quórum; integridade de mensagens com HMAC; rejeição de replay e checagem de plausibilidade.
+- **Arquitetura em camadas:** camadas do sistema em pastas (`campo/`, `middleware/`, `clientes/`, `compartilhado/`) e, dentro de cada módulo, `dominio/`, `aplicacao/`, `infraestrutura/`, `entrada/` e `config/`.
+- **Réplicas dos dados:** cada controlador tem o próprio H2. As leituras são processadas pelos três de forma determinística, os comandos são sequenciados pelo líder e confirmados só com a maioria gravada, e quem volta ao ar sincroniza o que perdeu com os pares.
+- **Controlador que cai:** o cliente reenvia o mesmo `requisicao_id` para outra réplica, que já conhece a operação e devolve o resultado original sem executar de novo.
+- **Controlador que mente:** votação no cliente, quarentena entre réplicas, comandos assinados com quórum de 2 nos atuadores e leituras de sensor com HMAC e checagem física.
+- **Roteiro de demonstração pelo painel:** ruptura até N3, controlador malicioso em quarentena com a sirene continuando a tocar, queda do líder no meio de um comando (sucesso deduplicado), recuperação com sincronização e ataques ao campo descartados.
+
+> [!WARNING]
+> **Limites declarados:** tolera 1 controlador falho ou malicioso por vez, não trata partição de rede e usa chaves HMAC fixas no código, por ser didático.
+>>>>>>> Stashed changes
 
 ---
 
@@ -558,9 +570,7 @@ O mesmo problema, resolvido em três estilos, deixa as diferenças em evidência
 | TP1 — controladores | `requisicao_id` replicado para a maioria antes da resposta | **replicação** |
 >>>>>>> origin
 
-gRPC é o que menos ajuda: não existe "método idempotente" no protocolo, todo RPC é uma chamada
-opaca. A ambiguidade do `DEADLINE_EXCEEDED` é a mesma de um `POST` que deu timeout — mas o HTTP
-ao menos oferece verbos com semântica combinada.
+gRPC é o que menos ajuda: não existe "método idempotente" no protocolo, todo RPC é uma chamada opaca. A ambiguidade do `DEADLINE_EXCEEDED` é a mesma de um `POST` que deu timeout — mas o HTTP ao menos oferece verbos com semântica combinada.
 
 ### Onde o contrato é verificado
 
@@ -573,17 +583,13 @@ ao menos oferece verbos com semântica combinada.
 
 ### O que cada estilo torna fácil, e o que torna difícil
 
-* **REST** é fácil de consumir por qualquer cliente e legível sem ferramenta; em troca, o
-  contrato é documentação, e quebrá-lo só aparece em produção.
-* **MQTT** é o único que permite adicionar um consumidor novo sem tocar no publicador; em
-  troca, não tem resposta nem canal de erro, e obriga a construir à mão a deduplicação e o
-  versionamento que os outros recebem prontos.
-* **gRPC** dá contrato executável, deadline no protocolo e status padronizado; em troca, exige
-  gerar stubs, não é legível em log, e tem armadilhas de evolução que formato de texto não tem.
+| Estilo | ✅ Facilita | ⚠️ Em troca |
+| --- | --- | --- |
+| **REST** | é fácil de consumir por qualquer cliente e legível sem ferramenta | o contrato é documentação, e quebrá-lo só aparece em produção |
+| **MQTT** | é o único que permite adicionar um consumidor novo sem tocar no publicador | não tem resposta nem canal de erro, e obriga a construir à mão a deduplicação e o versionamento que os outros recebem prontos |
+| **gRPC** | dá contrato executável, deadline no protocolo e status padronizado | exige gerar stubs, não é legível em log, e tem armadilhas de evolução que formato de texto não tem |
 
-A conclusão das quatro primeiras atividades é que eles não competem. Um sistema real de
-biblioteca usaria os três ao mesmo tempo: **REST na borda** para o catálogo público, **gRPC
-entre serviços** internos, e **MQTT para propagar** o que aconteceu.
+A conclusão das quatro primeiras atividades é que eles não competem. Um sistema real de biblioteca usaria os três ao mesmo tempo: **REST na borda** para o catálogo público, **gRPC entre serviços** internos, e **MQTT para propagar** o que aconteceu.
 
 ### Da chamada que falha ao acordo entre cópias
 
@@ -605,5 +611,4 @@ A partir da AP4, as atividades seguem a mesma incerteza em escalas crescentes:
 | TP1 | três réplicas, uma podendo mentir | um controlador responde valores que não conferem | maioria no cliente, quarentena entre réplicas e quórum nos atuadores toleram uma réplica bizantina |
 >>>>>>> origin
 
-Cada passo mostra que a ferramenta local (o status, o retry, o hash) não basta, e que a
-garantia precisa ser construída no protocolo entre as partes.
+Cada passo mostra que a ferramenta local (o status, o retry, o hash) não basta, e que a garantia precisa ser construída no protocolo entre as partes.
