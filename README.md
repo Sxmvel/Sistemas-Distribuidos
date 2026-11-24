@@ -14,6 +14,9 @@ controladas para medir o que acontece quando a comunicação dá errado, e a **A
 da biblioteca para uma blockchain didática: com várias cópias do mesmo estado, como saber qual
 é a certa?
 
+A **Atividade 9** volta à biblioteca para medir em vez de construir: com três processos, logs
+correlacionados e falhas provocadas, o que o cliente vê, e o que realmente aconteceu do outro lado?
+
 ---
 
 ## 🧭 O fio condutor
@@ -50,6 +53,11 @@ encadeado detecta qualquer adulteração. Mesmo assim, um atacante que reescreve
 a torna válida de novo, e duas réplicas separadas por uma partição podem ser válidas e discordar.
 Integridade não é consenso.
 
+**A Atividade 9** pergunta como se sabe o que aconteceu. Um gateway com failover na frente de duas
+réplicas do acervo, logs JSON com `correlation_id` e spans nos três processos, e sete experimentos
+de carga e caos. O cliente viu 0% de erro enquanto uma réplica falhava, a média ficou "boa" com um
+p99 de meio segundo, e o gargalo mudou de processo sem a latência do cliente mostrar onde.
+
 | | AP1 | AP2 | AP3 | AP4 |
 | --- | --- | --- | --- | --- |
 | **Estilo** | protocolo próprio | requisição/resposta | publish/subscribe | chamada de procedimento |
@@ -68,22 +76,22 @@ não introduzem um estilo novo. Usam o que veio antes para estudar falhas e acor
 
 ## 🛠️ Tecnologias utilizadas
 
-| Camada | AP1 | AP2 | AP3 | AP4 | AP5 | AP6 |
-| --- | --- | --- | --- | --- | --- | --- |
-| Comunicação | `socket` (TCP/IP) | FastAPI / HTTP | `paho-mqtt` (MQTT 5) | `grpcio` / HTTP/2 | FastAPI + `requests` e proxy TCP de falhas | réplicas em memória, sem rede |
-| Serialização | CSV, JSON, XML, YAML, TOML | JSON + Pydantic | JSON (envelope próprio) | Protocol Buffers | JSON + Pydantic | JSON canônico + SHA-256 |
-| Persistência | — | SQLite (`sqlite3` puro) | SQLite (deduplicação) | memória com trava | SQLite (`sqlite3` puro) | memória (cadeias imutáveis) |
-| Infraestrutura | — | — | Mosquitto 2 em Docker | — | servidores em subprocesso | Maven multimódulo |
-| Testes | manual | `pytest` (45) | `pytest` (61) | `pytest` (58) | `pytest` (81) | 54 verificações nos experimentos |
+| Camada | AP1 | AP2 | AP3 | AP4 | AP5 | AP6 | AP9 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Comunicação | `socket` (TCP/IP) | FastAPI / HTTP | `paho-mqtt` (MQTT 5) | `grpcio` / HTTP/2 | FastAPI + `requests` e proxy TCP de falhas | réplicas em memória, sem rede | FastAPI + `httpx` (gateway) e proxy TCP de falhas |
+| Serialização | CSV, JSON, XML, YAML, TOML | JSON + Pydantic | JSON (envelope próprio) | Protocol Buffers | JSON + Pydantic | JSON canônico + SHA-256 | JSON; logs em JSON Lines |
+| Persistência | — | SQLite (`sqlite3` puro) | SQLite (deduplicação) | memória com trava | SQLite (`sqlite3` puro) | memória (cadeias imutáveis) | catálogo sintético em memória |
+| Infraestrutura | — | — | Mosquitto 2 em Docker | — | servidores em subprocesso | Maven multimódulo | 3 serviços em subprocesso, `psutil` |
+| Testes | manual | `pytest` (45) | `pytest` (61) | `pytest` (58) | `pytest` (81) | 54 verificações nos experimentos | `pytest` (65) e 60 verificações nos experimentos |
 
-**Linguagem:** Python nas atividades 1 a 5 e Java 21 na Atividade 6.
+**Linguagem:** Python nas atividades 1 a 5 e 9, e Java 21 na Atividade 6.
 
 ---
 
 ## 🗂️ Organização do repositório
 
 Cada atividade tem a sua própria pasta e o seu próprio branch, com dependências independentes:
-ambiente virtual Python nas atividades 1 a 5 e projeto Maven na 6. Nada é compartilhado entre
+ambiente virtual Python nas atividades 1 a 5 e 9, e projeto Maven na 6. Nada é compartilhado entre
 elas além do domínio modelado. A AP5 parte de uma cópia da API da AP2, e a AP2 original não é
 alterada.
 
@@ -94,6 +102,7 @@ Atividade-Pratica-3/   publish/subscribe com MQTT e Mosquitto
 Atividade-Pratica-4/   serviço remoto com gRPC e Protocol Buffers
 Atividade-Pratica-5/   falhas controladas, retry, circuit breaker e segurança sobre a API da AP2
 Atividade-Pratica-6/   blockchain didática em Java: integridade, réplicas e consenso
+Atividade-Pratica-9/   testes, observabilidade e medição: carga, correlação, traces e caos
 ```
 
 Cada pasta traz o roteiro de execução no seu README e, quando existe, em `docs/`. As atividades
@@ -363,6 +372,44 @@ garantia de entrega que ele oferece.
     comum e dois ramos válidos, como um fork legítimo. Escolher entre eles é tarefa do consenso.
   * **Uma regra sem custo é fraudável.** "A mais longa vence" aceitou a fraude com um único
     bloco extra. Protocolos reais exigem trabalho ou stake, assinaturas e maioria honesta.
+
+---
+
+### 📍 [Atividade Prática 9](Atividade-Pratica-9/README.md)
+
+#### Testes, observabilidade e medição
+
+> Um balcão (gateway com rodízio, failover e quarentena) na frente de duas réplicas do acervo,
+> três processos HTTP reais escrevendo logs JSON com `correlation_id`, `message_id`,
+> `causation_id` e a árvore de spans. Um gerador de carga separa erro de aplicação de erro de
+> transporte, e um proxy TCP perturba o canal sem os serviços saberem. As respostas aos exercícios
+> do capítulo 15 estão em `Questoes-AP9.docx`, na pasta `entregavel/` gerada localmente (fora do repositório).
+
+* **Conceitos estudados:** teste funcional contra experimento distribuído; percentis e caudas;
+  vazão, saturação e lei de Little; disponibilidade observada; correlação e trace distribuído;
+  chaos engineering com hipótese de estado estável e critério de interrupção; aquecimento e
+  repetibilidade.
+* **Sete experimentos automatizados**, com 60 verificações:
+
+  | | Experimento | Resultado principal |
+  | --- | --- | --- |
+  | E01 | referência e repetibilidade | p50 ~20 ms em 3 execuções; o `medir_latencia.py` do material mede o dobro porque abre conexão a cada chamada |
+  | E02 | média contra percentis | 2,6% de requisições lentas: média 32 ms, p99 521 ms |
+  | E03 | amplificação da cauda | 2% de lentidão por chamada vira 17% com 10 chamadas em paralelo |
+  | E04 | carga e saturação | vazão para em ~188 req/s; com 32 clientes o gargalo migra para o balcão (96% de CPU) |
+  | E05 | correlação e trace | 60/60 operações reconstruídas; 12 erros invisíveis ao cliente ligados à origem |
+  | E06 | caos: réplica morta sob carga | 0 erros e 100% de disponibilidade; quarentena limita a 10 tentativas na réplica morta |
+  | E07 | caos: classes de erro | a mesma indisponibilidade vira sucesso lento, 504, 503 ou conexão recusada, conforme o lugar |
+
+* **Testes:** 65 testes de `pytest`, sem rede.
+* **Principais aprendizados:**
+  * **A latência do cliente diz que piorou, não onde.** Só a fila e a CPU por processo, com a
+    decomposição por spans, mostraram o gargalo saindo do acervo e indo para o balcão.
+  * **O failover apaga a evidência.** O cliente viu 0% de erro enquanto uma réplica falhava, e só a
+    correlação entre os logs dos três processos mostrou o defeito.
+  * **Medir também é um sistema.** O instrumento do material mediu o custo de abrir conexão junto
+    com o serviço, e no Windows foi preciso ajustar a resolução do relógio para os atrasos medidos
+    serem os configurados.
 
 ---
 
